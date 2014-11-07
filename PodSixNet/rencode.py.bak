@@ -148,7 +148,7 @@ class _SerializableRegistry(object):
                 if inspect.ismethod(cls._pack):
                     cls._pack = add_class_name(cls._pack)
                     self._registry[cls.__name__] = cls
-            except AttributeError, err:
+            except AttributeError as err:
                 raise NotSerializable(err)
 
     def unregister(self, cls):
@@ -555,7 +555,7 @@ def test():
     serializable.register(A)
 
     instance = [A(1,2,3), 1, A(1,3,4), 'sss']
-    print loads(dumps(instance))
+    print(loads(dumps(instance)))
 
 if __name__ == '__main__':
   test()

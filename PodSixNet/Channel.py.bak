@@ -1,7 +1,7 @@
 import sys, traceback
 
-from async import asynchat
-from rencode import loads, dumps
+from PodSixNet.async import asynchat
+from PodSixNet.rencode import loads, dumps
 
 class Channel(asynchat.async_chat):
 	endchars = '\0---\0'
@@ -23,7 +23,7 @@ class Channel(asynchat.async_chat):
 		if type(dict()) == type(data) and data.has_key('action'):
 			[getattr(self, n)(data) for n in ('Network', 'Network_' + data['action']) if hasattr(self, n)]
 		else:
-			print("OOB data (no such Network_action):", data)
+			print("OOB data (no such Network_action):".format(data))
 	
 	def Pump(self):
 		[asynchat.async_chat.push(self, d) for d in self.sendqueue]
