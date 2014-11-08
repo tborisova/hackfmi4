@@ -5,6 +5,7 @@ import pygame
 import sys
 import time
 from renderer import draw_everything
+from event_handler import unparse
 
 class Cell:
     def __init__(self):
@@ -179,15 +180,32 @@ class MazeGame:
             self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
             return True
 
+    def event_handling(self):
+        events = unparse()
+        if events is not None:
+            if events["left"]:
+                self.player.move("left")
+                #time.sleep(0.1)
+            if events["right"]:
+                self.player.move("right")
+                #time.sleep(0.1)
+            if events["up"]:
+                self.player.move("up")
+                #time.sleep(0.1)
+            if events["down"]:
+                self.player.move("down")
+                #time.sleep(0.1)
+
+
     def start_game(self):
         pygame.init()
-       # screen = pygame.display.set_mode((800, 600))
+        #screen = pygame.display.set_mode((800, 600))
         start = time.time()
         self.difference = 0
         #print(self.generate_JSON_string())
         while True:
-            self.clock.tick(30)
-            keys = pygame.key.get_pressed()
+            self.clock.tick(60)
+            #keys = pygame.key.get_pressed()
             #this is to be moved in another module
             if self.check_if_player_wins():
                 return True
@@ -195,18 +213,19 @@ class MazeGame:
             self.difference = end - start
             if self.difference >= self.time:
                 return False
-            if keys[pygame.K_LEFT]:
-                self.player.move("left")
-                time.sleep(0.1)
-            if keys[pygame.K_RIGHT]:
-                self.player.move("right")
-                time.sleep(0.1)
-            if keys[pygame.K_DOWN]:
-                self.player.move("down")
-                time.sleep(0.1)
-            if keys[pygame.K_UP]:
-                self.player.move("up")
-                time.sleep(0.1)
+            # if keys[pygame.K_LEFT]:
+            #     self.player.move("left")
+            #     time.sleep(0.1)
+            # if keys[pygame.K_RIGHT]:
+            #     self.player.move("right")
+            #     time.sleep(0.1)
+            # if keys[pygame.K_DOWN]:
+            #     self.player.move("down")
+            #     time.sleep(0.1)
+            # if keys[pygame.K_UP]:
+            #     self.player.move("up")
+            #     time.sleep(0.1)
+            self.event_handling()
             #draw_everything(screen, self.generate_coordinates())
 
             for event in pygame.event.get():
@@ -218,7 +237,7 @@ class MazeGame:
             with open("test_frame.json", "w") as json_file:
                 json_file.write(x)
 
-            #pygame.display.update()
+           # pygame.display.update()
         return True
 
     def set_difficulty(self):
