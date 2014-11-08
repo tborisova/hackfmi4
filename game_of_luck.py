@@ -3,6 +3,11 @@ import pygame.time
 import random
 import sys
 
+
+#-------------
+import renderer
+#------------
+
 class Game_of_luck:
 
     FPS = 60
@@ -22,6 +27,11 @@ class Game_of_luck:
 
 
     def start_game(self):
+
+        pygame.init()
+        screen = pygame.display.set_mode((800, 600))
+
+
         closest = self.wheel.balls[0]
         should_stop = False
         slowdown = Game_of_luck.SLOWDOWN
@@ -44,8 +54,19 @@ class Game_of_luck:
                     else:
                         return True
 
-    def __str__(self):
-        return "arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([str(ball) + "\n" for ball in self.wheel.balls])
+            renderer.draw_everything(screen, self.generate_coordinates())
+            pygame.display.update()
+
+
+    def generate_coordinates(self):
+        coordinates = ([ball.generate_coordinates() for ball in self.wheel.balls])
+        coordinates.insert(0, ("gradient_white", 0, 0))
+        coordinates.append(("arrow_of_fortune", 400, 55))
+        print(coordinates)
+        return coordinates
+
+    # def to_json():
+        #return "arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([ball.to_json() + "\n" for ball in self.wheel.balls])
 
 
 class Wheel_of_fortune:
@@ -80,5 +101,12 @@ class Fortune_ball:
         self.type = "bad_luck"
         self.vector = vector
 
-    def __str__(self):
-        return self.type + "\n" + str(self.vector.x + self.wheel_center[0]) + "\n" + str(self.vector.y + self.wheel_center[1]) + "\n"
+    def generate_coordinates(self):
+        return (self.type, self.vector.x + self.wheel_center[0], self.vector.y + self.wheel_center[1])
+   
+   # def to_json():
+        #return self.type + "\n" + str(self.vector.x + self.wheel_center[0]) + "\n" + str(self.vector.y + self.wheel_center[1]) + "\n"
+
+game = Game_of_luck(7)
+game.start_game()
+# print(game.generate_coordinates())
