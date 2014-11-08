@@ -81,8 +81,6 @@ class Ball(pygame.sprite.Sprite):
             self.spin = -self.dx
         self.rect.x = self.x
         self.rect.y = self.y
-        print("HERE")
-        print(self.angle)
 
 class Pointer(pygame.sprite.Sprite):
 
@@ -100,24 +98,21 @@ class Game(Server):
         self.AddPlayer(channel)
 
     def DelPlayer(self, player):
-        # print("Deleting Player {0}".format(str(player.addr)))
         del self.players[player]
         self.SendPlayers()
 
     def AddPlayer(self, player):
-        # if len(self.players) < 2:
-        # print("New Player {0}".format(str(player.addr)))
         self.players[player] = True
         self.SendPlayers()
-        # print("players {0}".format([p for p in self.players]))
 
     def SendPlayers(self):
         self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
     
     def SendToAll(self, data):
-        # print("HERE")
-        # print(data)
         [p.Send(data) for p in self.players]
+
+    def DeleteAllPlayers(self):
+        [DelPlayer(player) for player in self.players]
 
     def __init__(self, *args, **kwargs):
         pygame.init()
@@ -179,17 +174,13 @@ class Game(Server):
 
         if self.score > self.highscore:
             self.highscore = self.score
-            #pokazvane na topkata
+        
         self.ball.update()
-        # rotated = pygame.transform.rotate(self.ball.image, self.ball.angle)
-        # size = rotated.get_size()
-        # self.subrect.centerx = size[0] / 2
-        # self.subrect.centery = size[1] / 2
-        # self.newimg = rotated.subsurface(self.subrect)
-
+        
         if self.tries == 0:
             self.game_over = True
             self.SendToAll({'action': 'game_over', 'data' : self.get_json(), 'highscore': self.highscore})
+            self.DeleteAllPlayers()
             pygame.quit()
             exit()
 

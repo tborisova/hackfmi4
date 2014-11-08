@@ -54,7 +54,6 @@ class Gui(ConnectionListener):
         print(data)
 
     def Network_connected(self, data):
-        print('dddd')
         print("You are now connected to the server")
     
     def Network_error(self, data):
