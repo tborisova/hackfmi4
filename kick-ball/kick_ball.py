@@ -2,6 +2,7 @@ from pygame.locals import *
 import pygame
 import math
 import json
+import sys
 
 from settings import *
 
@@ -54,9 +55,6 @@ class Ball(pygame.sprite.Sprite):
             self.spin = -self.dx
         self.rect.x = self.x
         self.rect.y = self.y
-
-    def get_json(self):
-        return json.dumps({str(id(self)): {'image': 'ball', 'x': self.x, 'y': self.y}})
 
 
 class Pointer(pygame.sprite.Sprite):
@@ -137,52 +135,52 @@ class Game:
             self.game_over = True
 
     def get_json(self):
-        json = json
-
+        return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
 
 
 class Gui:
 
     def __init__(self, difficulty):
         pygame.init()
-        pygame.display.set_caption('Kick Ball')
-        pygame.display.set_icon(pygame.image.load('./data/icon.png'))
-        self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+        # pygame.display.set_caption('Kick Ball')
+        # pygame.display.set_icon(pygame.image.load('../images/icon.png'))
+        # self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         self.game = Game(difficulty)
-        self.screen.fill((0, 0, 0))
-        self.screen.set_colorkey((0, 0, 0))
+        # self.screen.fill((0, 0, 0))
+        # self.screen.set_colorkey((0, 0, 0))
         self.screen_center = (WINDOWWIDTH / 2, WINDOWHEIGHT / 2)
-        self.clock = pygame.time.Clock()
-        self.font1 = pygame.font.Font('./data/font.ttf', 40)
-        self.font2 = pygame.font.Font('./data/font.ttf', 22)
-        self.font3 = pygame.font.Font('./data/font.ttf', 52)
-        self.font4 = pygame.font.Font('./data/font.ttf', 16)
-        self.draw_info()
+        # self.clock = pygame.time.Clock()
+        # self.font1 = pygame.font.Font('./data/font.ttf', 40)
+        # self.font2 = pygame.font.Font('./data/font.ttf', 22)
+        # self.font3 = pygame.font.Font('./data/font.ttf', 52)
+        # self.font4 = pygame.font.Font('./data/font.ttf', 16)
+        # self.draw_info()
         self.game.ball.update()
-        self.screen.blit(self.game.newimg, self.game.ball.rect)
-        pygame.display.flip()
+        # self.screen.blit(self.game.newimg, self.game.ball.rect)
+        # pygame.display.flip()
 
     def start_game(self):
         while True:
-            self.clock.tick(60)
+            with open("test_frame.json", "w") as json_file:
+                json_file.write(self.game.get_json())
+            #self.clock.tick(60)
             self.handle_game_event()
             self.game.update()
-            self.screen.fill((0, 0, 0))
-            # self.draw_message(str(self.game.score), 22)
-            # self.draw_message(str(self.game.highscore), 22)
-            self.screen.blit(self.game.newimg, self.game.ball.rect)
-            self.draw_info()
-            pygame.display.flip()
+
+            print(self.game.get_json())
+            # self.screen.fill((0, 0, 0))
+            # self.screen.blit(self.game.newimg, self.game.ball.rect)
+            # self.draw_info()
+            # pygame.display.flip()
             if self.game.game_over:
                 return self.game.highscore
 
     def handle_game_event(self):
         for event in pygame.event.get():
                 if event.type == QUIT:
-                    return
+                    pygame.quit()
+                    sys.exit()
                 if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        return
                     if event.key == K_p:
                         self.game.paused = not self.game.paused
         self.game.pointer.rect.x, self.game.pointer.rect.y = pygame.mouse.get_pos()
@@ -202,32 +200,15 @@ class Gui:
         highscore_rect = highscore_text.get_rect()
         highscore_rect.y = score_rect.bottom + 5
         highscore_rect.x = 5
-        info2 = self.font4.render('P - Pause', 1, (255, 255, 255))
-        if self.game.paused:
-            self.draw_message('Paused')
         if self.game.game_over:
             self.draw_message('Game over :(')
-        info1 = self.font4.render('Esc - Quit', 1, (255, 255, 255))
-        info1_rect = info1.get_rect()
-        info1_rect.right = WINDOWWIDTH - 5
-        info1_rect.y = 5
-        info2_rect = info2.get_rect()
-        info2_rect.x = info1_rect.x
-        info2_rect.y = info1_rect.bottom + 5
         title = self.font3.render('Keep the ball in the air!', 1, (255, 255, 255))
         title_rect = title.get_rect()
-        title_rect.centerx = (
-        WINDOWWIDTH - score_rect.width - info1_rect.width) / 2
+        title_rect.centerx = WINDOWWIDTH / 2
         title_rect.y = score_rect.centery
-        title_rect = title.get_rect()
-        title_rect.y = score_rect.centery
-        title_rect.centerx = (
-        WINDOWWIDTH - score_rect.width - info1_rect.width) / 2
         self.screen.blit(score_text, score_rect)
         self.screen.blit(highscore_text, highscore_rect)
         self.screen.blit(title, title_rect)
-        self.screen.blit(info1, info1_rect)
-        self.screen.blit(info2, info2_rect)
 
 if __name__ == "__main__":
     gui = Gui(10)

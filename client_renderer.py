@@ -27,13 +27,13 @@ class Client:
 
 
         #-----------------------------------------Del
-        with open("test_frame.json") as test_frame:
+        with open("kick-ball/test_frame.json") as test_frame:
             try:
-                return json.load(test_frame) 
+                return json.load(test_frame)
             except ValueError:
                 lines = test_frame.readlines()
                 #print(lines)
-                return { "images" : {"55299120" : { "image" : "good_luck" , "x" : 217, "y" : 217}, "55298352" : { "image" : "good_luck" , "x" : 344, "y" : 492}, "55292592" : { "image" : "good_luck" , "x" : 581, "y" : 216}, "55299312" : { "image" : "good_luck" , "x" : 249, "y" : 431}, "55299344" : { "image" : "good_luck" , "x" : 291, "y" : 132}, "42733968" : { "image" : "good_luck" , "x" : 551, "y" : 430}, "42734000" : { "image" : "good_luck" , "x" : 457, "y" : 491}, "55299856" : { "image" : "bad_luck" , "x" : 507, "y" : 131}, "55299792" : { "image" : "bad_luck" , "x" : 398, "y" : 100}, "55299280" : { "image" : "bad_luck" , "x" : 202, "y" : 329}, "55292624" : { "image" : "bad_luck" , "x" : 598, "y" : 327}} }    
+                return { "images" : {"55299120" : { "image" : "good_luck" , "x" : 217, "y" : 217}, "55298352" : { "image" : "good_luck" , "x" : 344, "y" : 492}, "55292592" : { "image" : "good_luck" , "x" : 581, "y" : 216}, "55299312" : { "image" : "good_luck" , "x" : 249, "y" : 431}, "55299344" : { "image" : "good_luck" , "x" : 291, "y" : 132}, "42733968" : { "image" : "good_luck" , "x" : 551, "y" : 430}, "42734000" : { "image" : "good_luck" , "x" : 457, "y" : 491}, "55299856" : { "image" : "bad_luck" , "x" : 507, "y" : 131}, "55299792" : { "image" : "bad_luck" , "x" : 398, "y" : 100}, "55299280" : { "image" : "bad_luck" , "x" : 202, "y" : 329}, "55292624" : { "image" : "bad_luck" , "x" : 598, "y" : 327}} }
         #--------------------------------DEL
 
 
