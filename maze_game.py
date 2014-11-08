@@ -4,7 +4,7 @@ import time
 import pygame
 import sys
 import time
-#from renderer import draw_everything
+from renderer import draw_everything
 
 class Cell:
     def __init__(self):
@@ -47,6 +47,7 @@ class MazeGame:
         self.height = 600
         self.displacement_x = self.width // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
         self.displacement_y = self.height // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.clock = pygame.time.Clock()
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
@@ -144,19 +145,24 @@ class MazeGame:
         coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
-        jsons = ''
+    def image_to_json(self, coordinate):
+        return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
+
+    def generate_JSON_string(self):
+        coordinates = self.generate_coordinates()
+        json_dict = {}
         for index, coordinate in enumerate(coordinates):
             if coordinate[0] == "clock":
                 #to be implemented
                 continue
-            if index == len(coordinates) - 1:
-                jsons += self.image_to_json(coordinate)
-            else:
-                jsons += self.image_to_json(coordinate) + ','
+            json_dict[str(id(coordinate))] = {"image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
         #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
         #items = "{\"images\" : { " + items + "}"
-        items = json.dumps({"images": jsons})
-        items = items.replace('\\', '')
+        # items = json.dumps({"images": jsons})
+        # items = items.replace('\\', '')
+        #return json.dumps({"images": {"545478940": {"image": "maze_player", 'x': 30, 'y': 30}}})
+        something = {"images": json_dict}
+        return json.dumps(something)
 
         # json_string = ''
         # images = []
@@ -175,11 +181,12 @@ class MazeGame:
 
     def start_game(self):
         pygame.init()
-        screen = pygame.display.set_mode((800, 600))
+       # screen = pygame.display.set_mode((800, 600))
         start = time.time()
         self.difference = 0
         #print(self.generate_JSON_string())
         while True:
+            self.clock.tick(30)
             keys = pygame.key.get_pressed()
             #this is to be moved in another module
             if self.check_if_player_wins():
@@ -206,10 +213,12 @@ class MazeGame:
                 if event.type == pygame.QUIT:
                     sys.exit()
 
+            x = self.generate_JSON_string()
+            #print(x)
             with open("test_frame.json", "w") as json_file:
-                json_file.write(self.generate_JSON_string())
+                json_file.write(x)
 
-            pygame.display.update()
+            #pygame.display.update()
         return True
 
     def set_difficulty(self):
