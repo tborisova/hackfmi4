@@ -66,6 +66,10 @@ class Gui(ConnectionListener):
         print(data)
         exit()
 
+    def Network_game_over(self, data):
+        pygame.quit()
+        exit()
+
     def handle_game_event(self):
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -96,16 +100,16 @@ class Gui(ConnectionListener):
         self.screen.blit(score_text, score_rect)
         self.screen.blit(highscore_text, highscore_rect)
         self.screen.blit(title, title_rect)
-        rect = Rect(data['ball_rect_x'], data['ball_rect_y']/2, data['ball_rect_w'], data['ball_rect_h'])
+        rect = Rect(data['ball_rect_x'], data['ball_rect_y'], data['ball_rect_w'], data['ball_rect_h'])
         img = pygame.image.load('../images/ball.png')
         rotated = pygame.transform.rotate(img, data['newimg_angle'])
         size = rotated.get_size()
         subrect = img.get_rect()
+        subrect.width = 84
+        subrect.height = 83
         subrect.centerx = size[0] / 2
         subrect.centery = size[1] / 2
-
         rotated_img = rotated.subsurface(subrect)
-
         self.screen.blit(rotated_img, rect) #self.game.ball.rect)
 
 if __name__ == "__main__": 
