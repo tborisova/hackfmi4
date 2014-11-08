@@ -27,7 +27,7 @@ class Client:
 
 
         #-----------------------------------------Del
-        with open("kick-ball/test_frame.json") as test_frame:
+        with open("test_frame.json") as test_frame:
             try:
                 return json.load(test_frame)
             except ValueError:
