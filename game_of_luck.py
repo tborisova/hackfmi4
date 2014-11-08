@@ -5,7 +5,7 @@ import sys
 
 
 #-------------
-import renderer
+#import renderer
 #------------
 
 class Game_of_luck:
@@ -28,9 +28,8 @@ class Game_of_luck:
 
     def start_game(self):
 
-        pygame.init()
-        screen = pygame.display.set_mode((800, 600))
-
+        # pygame.init()
+        # screen = pygame.display.set_mode((800, 600))
 
         closest = self.wheel.balls[0]
         should_stop = False
@@ -54,8 +53,8 @@ class Game_of_luck:
                     else:
                         return True
 
-            renderer.draw_everything(screen, self.generate_coordinates())
-            pygame.display.update()
+            # renderer.draw_everything(screen, self.generate_coordinates())
+            # pygame.display.update()
 
 
     def generate_coordinates(self):
@@ -107,6 +106,6 @@ class Fortune_ball:
    # def to_json():
         #return self.type + "\n" + str(self.vector.x + self.wheel_center[0]) + "\n" + str(self.vector.y + self.wheel_center[1]) + "\n"
 
-game = Game_of_luck(7)
-game.start_game()
-# print(game.generate_coordinates())
+# game = Game_of_luck(7)
+# game.start_game()
+# # print(game.generate_coordinates())
