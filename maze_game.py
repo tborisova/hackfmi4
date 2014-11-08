@@ -1,4 +1,5 @@
 import random
+import json
 import time
 import pygame
 import sys
@@ -143,6 +144,29 @@ class MazeGame:
         coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
+    def image_to_json(self, coordinate):
+        #print(str(json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})))
+        return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
+
+
+    def generate_JSON_string(self):
+        coordinates = self.generate_coordinates()
+
+        items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
+        items = "{\"images\" : { " + items + "}"
+        return items
+        #json.dumps({})
+
+        # json_string = ''
+        # images = []
+        # for coordinate in coordinates:
+        #     if coordinate[0] == 'clock':
+        #         json_string += json.dumps({str(id(coordinate)): {'clock': coordinate[0], 'time': coordinate[1], 'x': coordinate[2], 'y': coordinate[3]}})
+        #     else:
+        #
+        #     json_string += json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
+        # return json_string
+
     def check_if_player_wins(self):
         if self.player.x == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement and \
             self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
@@ -153,6 +177,7 @@ class MazeGame:
         screen = pygame.display.set_mode((800, 600))
         start = time.time()
         self.difference = 0
+        print(self.generate_JSON_string())
         while True:
             keys = pygame.key.get_pressed()
             #this is to be moved in another module
