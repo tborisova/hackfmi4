@@ -4,7 +4,7 @@ import time
 import pygame
 import sys
 import time
-from renderer import draw_everything
+#from renderer import draw_everything
 
 class Cell:
     def __init__(self):
@@ -144,13 +144,6 @@ class MazeGame:
         coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
-    def image_to_json(self, coordinate):
-        #print(str(json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})))
-        return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
-
-
-    def generate_JSON_string(self):
-        coordinates = self.generate_coordinates()
         jsons = ''
         for index, coordinate in enumerate(coordinates):
             if coordinate[0] == "clock":
@@ -164,8 +157,6 @@ class MazeGame:
         #items = "{\"images\" : { " + items + "}"
         items = json.dumps({"images": jsons})
         items = items.replace('\\', '')
-        return items
-        #json.dumps({})
 
         # json_string = ''
         # images = []
@@ -187,7 +178,7 @@ class MazeGame:
         screen = pygame.display.set_mode((800, 600))
         start = time.time()
         self.difference = 0
-        print(self.generate_JSON_string())
+        #print(self.generate_JSON_string())
         while True:
             keys = pygame.key.get_pressed()
             #this is to be moved in another module
@@ -209,11 +200,14 @@ class MazeGame:
             if keys[pygame.K_UP]:
                 self.player.move("up")
                 time.sleep(0.1)
-            draw_everything(screen, self.generate_coordinates())
+            #draw_everything(screen, self.generate_coordinates())
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+
+            with open("test_frame.json", "w") as json_file:
+                json_file.write(self.generate_JSON_string())
 
             pygame.display.update()
         return True
