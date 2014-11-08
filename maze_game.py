@@ -151,9 +151,19 @@ class MazeGame:
 
     def generate_JSON_string(self):
         coordinates = self.generate_coordinates()
-
-        items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
-        items = "{\"images\" : { " + items + "}"
+        jsons = ''
+        for index, coordinate in enumerate(coordinates):
+            if coordinate[0] == "clock":
+                #to be implemented
+                continue
+            if index == len(coordinates) - 1:
+                jsons += self.image_to_json(coordinate)
+            else:
+                jsons += self.image_to_json(coordinate) + ','
+        #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
+        #items = "{\"images\" : { " + items + "}"
+        items = json.dumps({"images": jsons})
+        items = items.replace('\\', '')
         return items
         #json.dumps({})
 
