@@ -17,7 +17,7 @@ class Gui(ConnectionListener):
     def __init__(self, difficulty, host, port):
         pygame.init()
         pygame.display.set_caption('Kick Ball')
-        pygame.display.set_icon(pygame.image.load('../images/icon.png'))
+        pygame.display.set_icon(pygame.image.load('./images/icon.png'))
         self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         self.screen.fill((0, 0, 0))
         self.screen_center = (WINDOWWIDTH / 2, WINDOWHEIGHT / 2)
@@ -97,7 +97,7 @@ class Gui(ConnectionListener):
         self.screen.blit(highscore_text, highscore_rect)
         self.screen.blit(title, title_rect)
         rect = Rect(data['ball_rect_x'], data['ball_rect_y'], data['ball_rect_w'], data['ball_rect_h'])
-        img = pygame.image.load('../images/ball.png')
+        img = pygame.image.load('./images/ball.png')
         rotated = pygame.transform.rotate(img, data['newimg_angle'])
         size = rotated.get_size()
         subrect = img.get_rect()
