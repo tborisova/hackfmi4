@@ -1,4 +1,8 @@
 import random
+import pygame
+import sys
+import time
+from renderer import draw_everything
 
 class Cell:
     def __init__(self):
@@ -6,11 +10,35 @@ class Cell:
         self.left_wall = True
         self.was_visited = False
 
+class Player:
+    def __init__(self, maze):
+        self.x = 10
+        self.y = 10
+        self.cell_size = 42
+        self.maze = maze
+
+    def move(self, direction):
+        maze = list(zip(*self.maze))
+        if direction == "up":
+            if self.y > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].top_wall:
+                self.y -= self.cell_size
+        if direction == "down":
+            if self.y < len(maze) * self.cell_size and not maze[self.x // self.cell_size][self.y // self.cell_size + 1].top_wall:
+                self.y += self.cell_size
+        if direction == "left":
+            if self.x > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].left_wall:
+                self.x -= self.cell_size
+        if direction == "right":
+            if self.x < len(maze) * self.cell_size and not maze[self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
+                self.x += self.cell_size
+
 
 class MazeGame:
     def __init__(self, difficulty):
         self.difficulty = difficulty
-        self.maze = [[Cell() for i in range(4)] for j in range(4)]
+        self.maze = [[Cell() for i in range(3)] for j in range(3)]
+        self.generate_maze()
+        self.player = Player(self.maze)
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
@@ -44,7 +72,6 @@ class MazeGame:
             position = random.randint(0, len(neighbours) - 1)
         if len(neighbours) != 0:
             cell = neighbours[position]
-            print(neighbours, cell)
             #this might be a problem
             if cell == 1:
                 self.maze[cell_x][cell_y + 1].left_wall = False
@@ -72,16 +99,64 @@ class MazeGame:
         cell = (0, 0)
         while len(visited) > 0:
             cell = visited[len(visited) - 1]
+
             if no_continuation:
                 visited.pop()
             else:
                 visited.append(self.select_random_neighbour(cell[0], cell[1]))
-                cell = visited[len(visited) - 1]
 
                 if visited[len(visited) - 1] is None:
                     visited.pop()
+                cell = visited[len(visited) - 1]
+
 
             no_continuation = self.no_continuation_test(cell[0], cell[1])
+
+    def generate_coordinates(self):
+        coordinates = []
+        maze = (list(zip(*self.maze)))
+        for i in range(len(self.maze)):
+            for j in range(len(self.maze)):
+                if maze[i][j].left_wall and maze[i][j].top_wall:
+                    coordinates.append(("top_left_wall", i * self.player.cell_size, j * self.player.cell_size))
+                elif maze[i][j].top_wall:
+                    coordinates.append(("top_wall", i * self.player.cell_size, j * self.player.cell_size))
+                elif maze[i][j].left_wall:
+                    coordinates.append(("left_wall", i * self.player.cell_size, j * self.player.cell_size))
+
+        for i in range(len(maze)):
+            coordinates.append(("left_wall", len(maze) * self.player.cell_size, i * self.player.cell_size))
+            coordinates.append(("top_wall",  i * self.player.cell_size, len(maze) * self.player.cell_size))
+        coordinates.append(("maze_player", self.player.x, self.player.y))
+
+        return coordinates
+
+    def start_game(self):
+        pygame.init()
+        screen = pygame.display.set_mode((500, 500))
+        while True:
+            keys = pygame.key.get_pressed()
+            #this is to be moved in another module
+
+            if keys[pygame.K_LEFT]:
+                self.player.move("left")
+                time.sleep(0.3)
+            if keys[pygame.K_RIGHT]:
+                self.player.move("right")
+                time.sleep(0.3)
+            if keys[pygame.K_DOWN]:
+                self.player.move("down")
+                time.sleep(0.3)
+            if keys[pygame.K_UP]:
+                self.player.move("up")
+                time.sleep(0.3)
+            draw_everything(screen, self.generate_coordinates())
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+
+            pygame.display.update()
 
     def print(self):
         #for testing purposes
