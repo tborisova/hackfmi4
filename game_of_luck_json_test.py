@@ -60,9 +60,9 @@ class Game_of_luck:
 
 
         #---------------------------------------???
-            # for event in pygame.event.get():
-            #     if event.type == pygame.QUIT:
-            #         sys.exit()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
         #     screen.fill((255, 255, 255))
         #     for ball in self.wheel.balls:
         #         renderer.draw_everything(screen, ((ball.type, ball.vector.x + self.wheel.center[0], ball.vector.y + self.wheel.center[1]),) )
@@ -82,8 +82,10 @@ class Game_of_luck:
 
     def __str__(self):
        # return json
+        background = '"background" : {"image" : "gradient_white", "x" : 0, "y" : 0},  '
+        arrow = '"arrow_of_fortune_id" : {"image" : "arrow_of_fortune", "x" : 400, "y" : 60}, '
         #arrow = " \"key_of_arrow_object\" : {\"image\" : \"images/arrow_of_fortune.png\", \"x\" : " + str(self.wheel.center[0])  + ", \"y\" + " + str(self.wheel.center[1] - Wheel_of_fortune.RADIUS - 20) + "  } "
-        return "{ \"images\" : {" + ("".join([str(ball) + ", " for ball in self.wheel.balls]))[:-2] + "} }"
+        return "{ \"images\" : {"  + background + arrow + ("".join([str(ball) + ", " for ball in self.wheel.balls]))[:-2] + "} }"
         #return "Arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([str(ball) + "\n" for ball in self.wheel.balls])
 
 

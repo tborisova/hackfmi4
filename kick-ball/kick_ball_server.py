@@ -23,10 +23,14 @@ class ClientChannel(Channel):
         self._server.DelPlayer(self)
   
     def Network_print_game_state(self, data):
-        self._server.update_game()
-        self._server.SendToAll({'action': 'game_state', 'get_json': self._server.get_json, 'score': self._server.score, 'highscore': self._server.highscore})
+        self._server.update()
+        self._server.SendToAll({'action': 'game_state', 'get_json': self._server.get_json(), 'score': self._server.score, 
+                               'newimg_angle': self._server.ball.angle, 'ball_rect_x': self._server.ball.rect.x, 'ball_rect_y': self._server.ball.rect.y, 
+                               'ball_rect_h': self._server.ball.rect.height, 'ball_rect_w': self._server.ball.rect.width, 'highscore': self._server.highscore})
+                               #'mouse_x': self._server.pointer.rect.x, 'mouse_y': self._server.pointer.rect.y})
 
     def Network_mouse_pos(self, data):
+        print("JDJDJDJDJDJDJ")
         self._server.pointer.rect.x = data['x']
         self._server.pointer.rect.y = data['y']
 
@@ -111,6 +115,8 @@ class Game(Server):
         self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
     
     def SendToAll(self, data):
+        print("HERE")
+        print(data)
         [p.Send(data) for p in self.players]
 
     def __init__(self, *args, **kwargs):
@@ -121,7 +127,7 @@ class Game(Server):
         self.ball = Ball(*CENTER)
         self.pointer = Pointer()
         self.score = 0
-        self.difficulty = args[0]
+        self.difficulty = 3
         self.highscore = 0
         self.paused = False
         self.subrect = self.ball.image.get_rect()
@@ -173,7 +179,7 @@ class Game(Server):
 
         if self.score > self.highscore:
             self.highscore = self.score
-
+            #pokazvane na topkata
         self.ball.update()
         rotated = pygame.transform.rotate(self.ball.image, self.ball.angle)
         size = rotated.get_size()
@@ -200,6 +206,6 @@ if __name__ == "__main__":
         print("e.g. {0} localhost:31425".format(sys.argv[0]))
     else:
         host, port = sys.argv[1].split(":")
-        s = Game(3, localaddr=(host, int(port)))
+        s = Game(localaddr=(host, int(port)))
         s.Launch()
 
