@@ -1,9 +1,15 @@
 import os
 
+WINDOWWIDTH = 800
+WINDOWHEIGHT = 600
 CAP = 50
 BOUNCE = 0.66
 FRICTION = 0.99
 GRAVITY = 1
-KICK = 1.3
+KICK = 1.5
+TRIES = 3
 APP_PATH = os.path.dirname(__file__) + '\\'
-IMAGES_PATH = APP_PATH + 'data\\'
+IMAGES_PATH = APP_PATH + '\\..\\images\\'
+CENTER = WINDOWWIDTH / 2, WINDOWHEIGHT / 2
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
