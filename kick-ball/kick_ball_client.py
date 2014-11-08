@@ -27,12 +27,8 @@ class Gui(ConnectionListener):
         self.font3 = pygame.font.Font('./data/font.ttf', 52)
         self.font4 = pygame.font.Font('./data/font.ttf', 16)
         try:
-            print(host)
-            print(port)
-
             self.Connect((host, int(port)))
         except:
-            print("VKDFNGKDFMG")
             exit()
         connection.Send({'action': 'print_game_state'})
         pygame.display.flip()
@@ -67,7 +63,6 @@ class Gui(ConnectionListener):
 
     def Network_game_over(self, data):
         print(data)
-        # print()
         pygame.quit()
         sys.exit()
 
