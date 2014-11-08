@@ -1,4 +1,5 @@
 import random
+import time
 import pygame
 import sys
 import time
@@ -12,9 +13,10 @@ class Cell:
 
 class Player:
     def __init__(self, maze):
-        self.x = 10
-        self.y = 10
-        self.cell_size = 42
+        self.x = 7
+        self.y = 7
+        self.displacement = 7
+        self.cell_size = 25
         self.maze = maze
 
     def move(self, direction):
@@ -23,22 +25,27 @@ class Player:
             if self.y > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].top_wall:
                 self.y -= self.cell_size
         if direction == "down":
-            if self.y < len(maze) * self.cell_size and not maze[self.x // self.cell_size][self.y // self.cell_size + 1].top_wall:
+            if self.y // self.cell_size + 1 < len(maze) and self.y < len(maze) * self.cell_size and not maze[self.x // self.cell_size][self.y // self.cell_size + 1].top_wall:
                 self.y += self.cell_size
         if direction == "left":
             if self.x > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].left_wall:
                 self.x -= self.cell_size
         if direction == "right":
-            if self.x < len(maze) * self.cell_size and not maze[self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
+            if self.x // self.cell_size + 1 < len(maze) and self.x < len(maze) * self.cell_size and not maze[self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
                 self.x += self.cell_size
 
 
 class MazeGame:
     def __init__(self, difficulty):
         self.difficulty = difficulty
-        self.maze = [[Cell() for i in range(3)] for j in range(3)]
+        #self.maze = [[Cell() for i in range(3)] for j in range(3)]
+        self.set_difficulty()
         self.generate_maze()
         self.player = Player(self.maze)
+        self.width = 800
+        self.height = 600
+        self.displacement_x = self.width // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.displacement_y = self.height // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
@@ -107,6 +114,7 @@ class MazeGame:
 
                 if visited[len(visited) - 1] is None:
                     visited.pop()
+            if len(visited) > 0:
                 cell = visited[len(visited) - 1]
 
 
@@ -118,38 +126,53 @@ class MazeGame:
         for i in range(len(self.maze)):
             for j in range(len(self.maze)):
                 if maze[i][j].left_wall and maze[i][j].top_wall:
-                    coordinates.append(("top_left_wall", i * self.player.cell_size, j * self.player.cell_size))
+                    coordinates.append(("top_left_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
                 elif maze[i][j].top_wall:
-                    coordinates.append(("top_wall", i * self.player.cell_size, j * self.player.cell_size))
+                    coordinates.append(("top_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
                 elif maze[i][j].left_wall:
-                    coordinates.append(("left_wall", i * self.player.cell_size, j * self.player.cell_size))
+                    coordinates.append(("left_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
 
         for i in range(len(maze)):
-            coordinates.append(("left_wall", len(maze) * self.player.cell_size, i * self.player.cell_size))
-            coordinates.append(("top_wall",  i * self.player.cell_size, len(maze) * self.player.cell_size))
-        coordinates.append(("maze_player", self.player.x, self.player.y))
-
+            coordinates.append(("left_wall", self.displacement_x + len(maze) * self.player.cell_size,
+                                self.displacement_y + i * self.player.cell_size))
+            coordinates.append(("top_wall", self.displacement_x + i * self.player.cell_size,
+                                self.displacement_y + len(maze) * self.player.cell_size))
+        coordinates.append(("maze_player", self.displacement_x + self.player.x, self.displacement_y + self.player.y))
+        coordinates.append(("maze_win", self.displacement_x + (len(maze) - 1) * self.player.cell_size + self.player.displacement,
+                            self.displacement_y + (len(maze) - 1) * self.player.cell_size + self.player.displacement))
         return coordinates
+
+    def check_if_player_wins(self):
+        if self.player.x == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement and \
+            self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
+            return True
 
     def start_game(self):
         pygame.init()
-        screen = pygame.display.set_mode((500, 500))
+        screen = pygame.display.set_mode((800, 600))
+        start = time.time()
+        clock = pygame.font.Font(None, 32)
         while True:
             keys = pygame.key.get_pressed()
             #this is to be moved in another module
-
+            if self.check_if_player_wins():
+                return True
+            end = time.time()
+            print(end - start)
+            if end - start >= self.time:
+                return False
             if keys[pygame.K_LEFT]:
                 self.player.move("left")
-                time.sleep(0.3)
+                time.sleep(0.1)
             if keys[pygame.K_RIGHT]:
                 self.player.move("right")
-                time.sleep(0.3)
+                time.sleep(0.1)
             if keys[pygame.K_DOWN]:
                 self.player.move("down")
-                time.sleep(0.3)
+                time.sleep(0.1)
             if keys[pygame.K_UP]:
                 self.player.move("up")
-                time.sleep(0.3)
+                time.sleep(0.1)
             draw_everything(screen, self.generate_coordinates())
 
             for event in pygame.event.get():
@@ -157,6 +180,15 @@ class MazeGame:
                     sys.exit()
 
             pygame.display.update()
+        return True
+
+    def set_difficulty(self):
+        if self.difficulty <= 6:
+            self.maze = [[Cell() for i in range(10)] for j in range(10)]
+        else:
+            self.maze = [[Cell() for i in range(int(self.difficulty * 2.3))] for j in range(int(self.difficulty * 2.3))]
+
+        self.time = 30 + 100 // self.difficulty
 
     def print(self):
         #for testing purposes
