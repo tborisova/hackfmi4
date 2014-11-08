@@ -140,6 +140,7 @@ class MazeGame:
         coordinates.append(("maze_player", self.displacement_x + self.player.x, self.displacement_y + self.player.y))
         coordinates.append(("maze_win", self.displacement_x + (len(maze) - 1) * self.player.cell_size + self.player.displacement,
                             self.displacement_y + (len(maze) - 1) * self.player.cell_size + self.player.displacement))
+        coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
     def check_if_player_wins(self):
@@ -151,15 +152,15 @@ class MazeGame:
         pygame.init()
         screen = pygame.display.set_mode((800, 600))
         start = time.time()
-        clock = pygame.font.Font(None, 32)
+        self.difference = 0
         while True:
             keys = pygame.key.get_pressed()
             #this is to be moved in another module
             if self.check_if_player_wins():
                 return True
             end = time.time()
-            print(end - start)
-            if end - start >= self.time:
+            self.difference = end - start
+            if self.difference >= self.time:
                 return False
             if keys[pygame.K_LEFT]:
                 self.player.move("left")
@@ -187,8 +188,7 @@ class MazeGame:
             self.maze = [[Cell() for i in range(10)] for j in range(10)]
         else:
             self.maze = [[Cell() for i in range(int(self.difficulty * 2.3))] for j in range(int(self.difficulty * 2.3))]
-
-        self.time = 30 + 100 // self.difficulty
+        self.time = 60 + 400 // self.difficulty
 
     def print(self):
         #for testing purposes
