@@ -1,6 +1,7 @@
 import pygame
 import json
 import images
+import sys
 
 class Client:
 
@@ -23,8 +24,8 @@ class Client:
 
     # def get_dicts_from_json(self, frame_json):
     #     frame_objects = json.load(frame_json)
-    #     image_objects = json.load(frame_objects[images])
-    #     text_objects = json.load(frame_objects[texts])
+    #     image_objects = json.load(frame_objects["images"])
+    #     text_objects = json.load(frame_objects["texts"])
     #     # ... other objects?
 
     def get_all_objects(self, frame_json):
@@ -44,14 +45,19 @@ class Client:
             #all_objects = self.get_all_objects(frame_json)
             all_objects = self.get_all_objects(None)
 
-            self.draw_all_images(self, self.inner_game_screen, all_objects[images])
+            self.draw_all_images(self.inner_game_screen, all_objects["images"])
             #draw_text(self, inner_game_screen)
-            self.screen.draw((120, 40), self.inner_game_screen)
+            self.screen.blit(self.inner_game_screen, (120, 40))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                sys.exit()
+                
 
     def draw_all_images(self, sruface, images):
         for image in images:
             self.draw_image(surface, image)
 
     def draw_image(self, surface, image_info):
-        image = images[image_info[image]]
+        image = images[image_info["image"]]
         surface.blit(image, (image_info[x], image_info[y]))
