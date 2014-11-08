@@ -2,6 +2,20 @@ from pygame.math import Vector2
 import pygame.time
 import random
 import sys
+import json
+
+
+
+# del------------------------------------------------del
+import pygame
+#import renderer
+
+pygame.init()
+#screen = pygame.display.set_mode((800, 600))
+# ---------------------------------------------------/
+
+
+
 
 class Game_of_luck:
 
@@ -42,10 +56,37 @@ class Game_of_luck:
                     if closest.type == "bad_luck":
                         return False
                     else:
-                        return True
+                        return True 
+
+
+        #---------------------------------------???
+            # for event in pygame.event.get():
+            #     if event.type == pygame.QUIT:
+            #         sys.exit()
+        #     screen.fill((255, 255, 255))
+        #     for ball in self.wheel.balls:
+        #         renderer.draw_everything(screen, ((ball.type, ball.vector.x + self.wheel.center[0], ball.vector.y + self.wheel.center[1]),) )
+        #     pygame.display.update()
+        # #---.------------------.............////////////
+
+
+
+
+
+        #!!!!!!!!!!!!!!___________------------------------------_DEL
+            with open("test_frame.json", "w") as json_file:
+                json_file.write(str(self))
+            
+        #------//////////////////////////////////////////////////
+
 
     def __str__(self):
-        return "arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([str(ball) + "\n" for ball in self.wheel.balls])
+       # return json
+        #arrow = " \"key_of_arrow_object\" : {\"image\" : \"images/arrow_of_fortune.png\", \"x\" : " + str(self.wheel.center[0])  + ", \"y\" + " + str(self.wheel.center[1] - Wheel_of_fortune.RADIUS - 20) + "  } "
+        return "{ \"images\" : {" + ("".join([str(ball) + ", " for ball in self.wheel.balls]))[:-2] + "} }"
+        #return "Arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([str(ball) + "\n" for ball in self.wheel.balls])
+
+
 
 
 class Wheel_of_fortune:
@@ -55,7 +96,7 @@ class Wheel_of_fortune:
     def __init__(self, good_balls_count, center):
         self.center = center
         self.good_balls_count = good_balls_count
-        self.speed = random.randint(400,800)
+        self.speed = random.randint(800, 1200)
         #self.speed = random.randint(400, 700)
         self.balls = [Fortune_ball(Vector2(0, Wheel_of_fortune.RADIUS).rotate((i * 360) / \
                                               Wheel_of_fortune.BALLS_COUNT), \
@@ -81,4 +122,17 @@ class Fortune_ball:
         self.vector = vector
 
     def __str__(self):
-        return self.type + "\n" + str(self.vector.x + self.wheel_center[0]) + "\n" + str(self.vector.y + self.wheel_center[1]) + "\n"
+        return json.dumps({str(id(self)) : {'image' : self.type, 'x' : self.vector[0] + self.wheel_center[0], \
+            'y': self.vector[1] + self.wheel_center[1]}})[1:][:-1]
+
+
+
+
+
+#test ------------------------------   ///////////////////////
+game = Game_of_luck(3)
+print(game.start_game())
+#print(game.wheel.balls[0])
+#print()
+#print(game)
+#-----------------------
