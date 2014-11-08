@@ -66,8 +66,10 @@ class Gui(ConnectionListener):
         exit()
 
     def Network_game_over(self, data):
+        print(data)
+        # print()
         pygame.quit()
-        exit()
+        sys.exit()
 
     def handle_game_event(self):
             for event in pygame.event.get():

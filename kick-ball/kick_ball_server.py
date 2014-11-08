@@ -111,9 +111,6 @@ class Game(Server):
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
 
-    def DeleteAllPlayers(self):
-        [DelPlayer(player) for player in self.players]
-
     def __init__(self, *args, **kwargs):
         pygame.init()
         Server.__init__(self, *args, **kwargs)
@@ -176,13 +173,13 @@ class Game(Server):
             self.highscore = self.score
         
         self.ball.update()
+        print(self.tries)
         
         if self.tries == 0:
             self.game_over = True
             self.SendToAll({'action': 'game_over', 'data' : self.get_json(), 'highscore': self.highscore})
-            self.DeleteAllPlayers()
             pygame.quit()
-            exit()
+            sys.exit()
 
     def get_json(self):
         return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
