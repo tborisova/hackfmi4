@@ -27,12 +27,12 @@ def parse(events):
 
 
 def unparse():
-    with open("events.json", "r") as json_file:
-        try:
-            return json.load(json_file)
-        except ValueError:
-           return {"left": False,
-                   "right": False,
-                   "up": False,
-                   "down": False
-                     }
+  with open("events.json", "r") as json_file:
+    try:
+      return json.load(json_file)
+    except ValueError:
+      return {"left": False,
+               "right": False,
+               "up": False,
+               "down": False
+                 }

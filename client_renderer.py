@@ -67,6 +67,16 @@ class Client:
 
     def draw_all_images(self, surface, images):
         player = 0
+
+        #draw background first
+        bg = None
+        for image in images:
+            if image == "background":
+                self.draw_image(surface, images[image])
+                bg = image
+                break
+        del images[image]
+
         for image in images:
             if images[image]["image"] == "maze_player":
                 player = image
