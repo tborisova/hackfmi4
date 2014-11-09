@@ -30,7 +30,7 @@ class InputBox(Rect):
 
     def __init__(self, dimensions, pos, text="", text_colour=(0, 0, 0),
                  text_font=(None, 50), bg_colour=(255, 255, 255),
-                 frame_colour=None, frame_size=0):
+                 frame_colour=(0, 0, 0), frame_size=1):
         Rect.__init__(self, (pos[0] - dimensions[0] / 2,
                              pos[1] - dimensions[1] / 2), dimensions)
         self.text = text
