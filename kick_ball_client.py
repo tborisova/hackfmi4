@@ -1,11 +1,8 @@
 from pygame.locals import *
 import pygame
-import math
-import json
 import sys
 from get_ip import check_for_internet_conection as get_ip
 
-from kick_ball_server import Game
 from settings import *
 from time import sleep
 from sys import stdin, exit
@@ -77,6 +74,7 @@ class Gui(ConnectionListener):
 
     def draw_message(self, message):
         font = pygame.font.Font(IMAGES_PATH + 'font.ttf', 52)
+
         label = font.render(message, 1, WHITE)
         rect = label.get_rect()
         rect.center = CENTER

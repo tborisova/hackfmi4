@@ -188,8 +188,9 @@ class Button(TextBox):
                                            "frame": (0, 0, 0)}}}
 
     def __init__(self, button_type, dimensions, pos, text,
-                 background=None, text_colour=(0, 0, 0), text_font=(None, 50),
+                 text_colour=(0, 0, 0), text_font=(None, 50),
                  frame_size=3):
+        print(text_colour)
         TextBox.__init__(self, dimensions, pos, text, text_colour,
                          text_font)
         self.button_type = button_type
@@ -197,17 +198,12 @@ class Button(TextBox):
         self.state_colours = Button.BUTTON_TYPES[button_type]
         self.state = "normal"
         self.clicked = False
-        self.background = background
-        if background is not None:
-            self.background = pygame.transform.scale(background, dimensions)
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.state_colours[self.state]["background"],
                          self)
         pygame.draw.rect(surface, self.state_colours[self.state]["frame"],
                          self, self.frame_size)
-        if self.background is not None:
-            pygame.blit(surface, self.topleft)
         TextBox.draw(self, surface)
 
     def update_state(self, cursor_pos, event):
