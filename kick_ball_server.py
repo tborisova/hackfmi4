@@ -116,7 +116,6 @@ class Game(Server):
 
     def AddPlayer(self, player):
         self.players[player] = True
-        self.SendPlayers()
         self.players_order[player] = self.current_index
         self.current_index += 1
 
