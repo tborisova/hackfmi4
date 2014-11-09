@@ -92,7 +92,7 @@ class MazeGame(Server):
         self.difference = 0
         self.clock = pygame.time.Clock()
         self.players = WeakKeyDictionary()
-        self.players = WeakKeyDictionary()
+        self.players_order = WeakKeyDictionary()
         self.current_index = 0
         print('Server launched')
 
