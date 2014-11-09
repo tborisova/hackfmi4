@@ -17,15 +17,15 @@ class Gui(ConnectionListener):
     def __init__(self, difficulty, host, port):
         pygame.init()
         pygame.display.set_caption('Kick Ball')
-        pygame.display.set_icon(pygame.image.load('./images/icon.png'))
+        pygame.display.set_icon(pygame.image.load(IMAGES_PATH + 'icon.png'))
         self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         self.screen.fill((0, 0, 0))
         self.screen_center = (WINDOWWIDTH / 2, WINDOWHEIGHT / 2)
         self.clock = pygame.time.Clock()
-        self.font1 = pygame.font.Font('./data/font.ttf', 40)
-        self.font2 = pygame.font.Font('./data/font.ttf', 22)
-        self.font3 = pygame.font.Font('./data/font.ttf', 52)
-        self.font4 = pygame.font.Font('./data/font.ttf', 16)
+        self.font1 = pygame.font.Font(FONTS_PATH + 'font.tff', 40)
+        self.font2 = pygame.font.Font(FONTS_PATH + 'font.tff', 22)
+        self.font3 = pygame.font.Font(FONTS_PATH + 'font.tff', 52)
+        self.font4 = pygame.font.Font(FONTS_PATH + 'font.tff', 16)
         try:
             self.Connect((host, int(port)))
         except:
@@ -74,7 +74,7 @@ class Gui(ConnectionListener):
             connection.Send({'action': 'mouse_pos', 'x': x, 'y': y})
 
     def draw_message(self, message):
-        font = pygame.font.Font('./data/font.ttf', 52)
+        font = pygame.font.Font(IMAGES_PATH + 'font.ttf', 52)
         label = font.render(message, 1, WHITE)
         rect = label.get_rect()
         rect.center = CENTER
@@ -114,12 +114,7 @@ class Gui(ConnectionListener):
         self.screen.blit(rotated_img, rect)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425", sys.argv[0])
-    else:
-        host, port = sys.argv[1].split(":")
-        c = Gui(10, host, int(port))
+        c = Gui(10, "localhost", int(31425))
         while True:
             c.Loop()
             sleep(0.001)

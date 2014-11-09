@@ -104,6 +104,9 @@ class Pointer(pygame.sprite.Sprite):
 class Game(Server):
     channelClass = ClientChannel
 
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
+
     def Connected(self, channel, addr):
         if self.current_index < 2:
             self.AddPlayer(channel)
@@ -212,10 +215,5 @@ class Game(Server):
             sleep(0.0001)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425".format(sys.argv[0]))
-    else:
-        host, port = sys.argv[1].split(":")
-        s = Game(localaddr=(host, int(port)))
-        s.Launch()
+    s = Game(localaddr=('localhost', int(31425)))
+    s.Launch()
