@@ -2,6 +2,8 @@ This is a desktop application written in Python 3.4. We use PodSixNet and Pygame
 
 For developer uses:
 
+--------------------
+
 To start kick ball game type:
 
 <code>
@@ -13,6 +15,8 @@ Open 2 other terminal windowns and type:
 <code>
   python kick_ball_client.py host:port-like-the-one-for-server
 </code>
+
+-------------------
 
 
 To start maze game type:
@@ -26,6 +30,9 @@ Open 2 other terminal windowns and type:
 <code>
   python maze_client.py host:port-like-the-one-for-server
 </code>
+
+-------------------
+
 
 To start game of luck type:
 
