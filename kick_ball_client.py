@@ -114,7 +114,7 @@ class Gui(ConnectionListener):
         self.screen.blit(rotated_img, rect)
 
 if __name__ == "__main__":
-        c = Gui(10, "localhost", int(31425))
+        c = Gui(10, "10.0.201.111", int(31425))
         while True:
             c.Loop()
             sleep(0.001)

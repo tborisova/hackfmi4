@@ -105,7 +105,7 @@ class Game(Server):
     channelClass = ClientChannel
 
     def player_can_write(self, channel):
-        return self.players_order[channel] == 0
+        return True
 
     def Connected(self, channel, addr):
         if self.current_index < 2:
@@ -215,5 +215,5 @@ class Game(Server):
             sleep(0.0001)
 
 if __name__ == "__main__":
-    s = Game(localaddr=('localhost', int(31425)))
+    s = Game(localaddr=('10.0.201.111', int(31425)))
     s.Launch()
