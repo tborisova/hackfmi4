@@ -61,7 +61,7 @@ if __name__ == "__main__":
     #     print("Usage: {0} host:port".format(sys.argv[0]))
     #     print("e.g. {0} localhost:31425",sys.argv[0])
     # else:
-    host = '10.0.201.111'
+    host = 'localhost'
     port =  22022
     c = Client(host, int(port))
 
