@@ -15,7 +15,7 @@ class Client(ConnectionListener):
             self.screen = pygame.display.set_mode((800, 600))
         except:
             exit()
- 
+
     def Loop(self):
         connection.Send({'action': 'handle_input', 'input' : pygame.key.get_pressed()})
         connection.Pump()
@@ -23,11 +23,11 @@ class Client(ConnectionListener):
 
     def Network_connected(self, data):
         print("You are now connected to the server")
-      
+
     def Network_error(self, data):
         print("error: {0}".format(data['error'][1]))
         connection.Close()
-      
+
     def Network_disconnected(self, data):
         # print()
         # print('Server disconnected')
@@ -38,12 +38,13 @@ class Client(ConnectionListener):
     def Network_draw_everything(self, data):
         #print(data)
         renderer.draw_everything(self.screen, data['objects'])
-        pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
               sys.exit()
-
+        x, y = pygame.mouse.get_pos()
+        connection.Send({'action': 'mouse_pos', 'x': x, 'y': y})
+        pygame.display.update()
        # if data['should_stop']:
         #    return data['closest_type']
         #    sys.exit()

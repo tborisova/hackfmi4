@@ -72,7 +72,7 @@ class Gui(ConnectionListener):
                     pygame.quit()
                     sys.exit()
                 x, y = pygame.mouse.get_pos()
-                connection.Send({'action': 'mouse_pos', 'x' : x, 'y': y})
+                connection.Send({'action': 'mouse_pos', 'x': x, 'y': y})
 
     def draw_message(self, message):
         font = pygame.font.Font('./data/font.ttf', 52)
