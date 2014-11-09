@@ -9,43 +9,48 @@ screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
 first_player_text = gui_elements.TextBox(
-    (200, 50), (200, 40), "Player 1", (0, 0, 0), (r"./data/font.ttf", 100))
-second_player_text = gui_elements.TextBox(
-    (200, 50), (600, 40), "Player 2", (0, 0, 0), (r"./data/font.ttf", 100))
+    (300, 100), (200, 100), "Challenge Accepted?", (0, 0, 0), (r"data/fonts/font.tff", 150))
 
-maze_button = gui_elements.Button(
-    "default", (255, 50), (155, 300), "Maze Runner", None, (0, 0, 0), (None, 100))
-maze_input = gui_elements.InputBox(
-    (70, 35), (343, 300), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
-game_of_luck_button = gui_elements.Button(
-    "default", (255, 50), (155, 380), "Game of Luck", None, (0, 0, 0), (None, 100))
-game_of_luck_input = gui_elements.InputBox(
-    (70, 35), (343, 380), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
-kick_the_ball_button = gui_elements.Button(
-    "default", (255, 50), (155, 460), "Kick the Ball", None, (0, 0, 0), (None, 100))
-kick_the_ball_input = gui_elements.InputBox(
-    (70, 35), (343, 460), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+create_button = gui_elements.Button(
+    "default", (255, 50), (200, 300), "Create", None, (0, 0, 0), (None, 100))
+
+join_button = gui_elements.Button(
+    "default", (255, 50), (200, 380), "Join", None, (0, 0, 0), (None, 100))
+
 
 maze_button2 = gui_elements.Button(
     "default", (255, 50), (555, 300), "Maze Runner", None, (0, 0, 0), (None, 100))
 maze_input2 = gui_elements.InputBox(
-    (70, 35), (743, 300), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+    (70, 35), (743, 300), "", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
 
 game_of_luck_button2 = gui_elements.Button(
     "default", (255, 50), (555, 380), "Game of Luck", None, (0, 0, 0), (None, 100))
 game_of_luck_input2 = gui_elements.InputBox(
-    (70, 35), (743, 380), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+    (70, 35), (743, 380), "", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
 
 kick_the_ball_button2 = gui_elements.Button(
-    "default", (255, 50), (555, 460), "Kick the Ball", None, (0, 0, 0), (None, 100))
+    "default", (255, 50), (555, 460), "Kick the Ball", None, (0, 0, 0), (None, 59))
 kick_the_ball_input2 = gui_elements.InputBox(
-    (70, 35), (743, 460), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+    (70, 35), (743, 460), "", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+
+# ip_text = gui_elements.TextBox(
+#     (60, 50), (450, 90), "IP:", (0, 0, 0), (r"data/fonts/font.tff", 40))
+# ip_input0 = gui_elements.InputBox(
+#     (50, 40), (500, 93), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+# ip_input1 = gui_elements.InputBox(
+#     (50, 40), (560, 93), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+# ip_input2 = gui_elements.InputBox(
+#     (50, 40), (620, 93), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+# ip_input3 = gui_elements.InputBox(
+#     (50, 40), (680, 93), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+#
+# ip_text = gui_elements.TextBox(
+#     (60, 50), (450, 90), "IP:", (0, 0, 0), (r"data/fonts/font.tff", 40))
 
 
-
-input_boxes = [maze_input, game_of_luck_input, kick_the_ball_input, maze_input2, game_of_luck_input2, kick_the_ball_input2]
-buttons = [maze_button, game_of_luck_button, kick_the_ball_button, maze_button2, game_of_luck_button2, kick_the_ball_button2]
-text_boxes = [first_player_text, second_player_text]
+input_boxes = [maze_input2, game_of_luck_input2, kick_the_ball_input2]
+buttons = [join_button, create_button, maze_button2, game_of_luck_button2, kick_the_ball_button2]
+text_boxes = [first_player_text, ]
 views = input_boxes + buttons + text_boxes
 
 for input_box in input_boxes:
