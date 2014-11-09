@@ -51,16 +51,16 @@ class ClientMaze(ConnectionListener):
             sys.exit()
         if keys[pygame.K_LEFT]:
             connection.Send({'action': 'player_move', 'move': 'left'})
-            time.sleep(0.01)
+            sleep(0.1)
         if keys[pygame.K_RIGHT]:
             connection.Send({'action': 'player_move', 'move': 'right'})
-            time.sleep(0.01)
+            sleep(0.1)
         if keys[pygame.K_DOWN]:
             connection.Send({'action': 'player_move', 'move': 'down'})
-            time.sleep(0.01)
+            sleep(0.1)
         if keys[pygame.K_UP]:
             connection.Send({'action': 'player_move', 'move': 'up'})
-            time.sleep(0.01)
+            sleep(0.1)
 
         draw_everything(self.screen, data['objects'])
 
