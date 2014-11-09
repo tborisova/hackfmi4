@@ -3,20 +3,88 @@ import pygame.time
 import random
 import sys
 
+from time import sleep, localtime
+from weakref import WeakKeyDictionary
 
-#-------------
-#import renderer
-#------------
+from PodSixNet.Server import Server
+from PodSixNet.Channel import Channel
 
-class Game_of_luck:
+class ClientChannel(Channel):
+    
+    def __init__(self, *args, **kwargs):
+        self.nickname = "anonymous"
+        Channel.__init__(self, *args, **kwargs)
+  
+    def Close(self):
+        print("CLOSING")
+        # self._server.DelPlayer(self)
+    
+    def Network_print_game_state(self, data):
+        data1 = self._server.do_stuff()        
+        
+        objects = self._server.generate_coordinates()
+        self._server.SendToAll({'action': 'render_game_state', 'objects': objects, 'should_stop': data1['should_stop'], 'closest_type': data1['closest_type']})
 
+    def Network_player_move(self, data):
+        self._server.player.move(data['move'])
+
+class Game_of_luck(Server):
+
+    channelClass = ClientChannel
     FPS = 60
     WHEEL_CENTER = (400, 300)
     SLOWDOWN = 2
 
-    def __init__(self, difficulty):
-        self.wheel = Wheel_of_fortune(difficulty, Game_of_luck.WHEEL_CENTER)
+    def __init__(self, *args, **kwargs):
+        Server.__init__(self, *args, **kwargs) 
+        self.players = WeakKeyDictionary()
         self.clock = pygame.time.Clock()
+        print('Server launched')
+
+    def do_stuff(self):
+        data = {}
+        self.clock.tick(Game_of_luck.FPS)
+        self.wheel.rotate(self.wheel.speed / 100)
+        self.wheel.speed -= self.slowdown
+
+        if self.wheel.speed <= 30 and self.should_stop is False:
+            closest = self.find_closest_to_target()
+            if closest.vector[0] != -1234:
+                self.wheel.speed = 30
+                self.slowdown = 0
+                self.should_stop = True
+
+        closest_type = True
+        if self.should_stop is True:
+            data['should_stop'] = True
+            if closest.vector[0] > 0:
+                if closest.type == "bad_luck":
+                    closest_type = False
+                else:
+                    closest_type = True
+        else:
+          data['should_stop'] = False
+        data['closest_type'] = closest_type
+        return data
+    def Launch(self, difficulty):
+        self.wheel = Wheel_of_fortune(difficulty, Game_of_luck.WHEEL_CENTER)
+        self.closest = self.wheel.balls[0]
+        self.should_stop = False
+        self.slowdown = Game_of_luck.SLOWDOWN
+
+        while True:
+            self.Pump()
+            sleep(0.0001)
+
+    def Connected(self, channel, addr):
+        self.AddPlayer(channel)
+
+    def AddPlayer(self, player):
+        self.players[player] = True
+        # self.SendToPlayers()
+
+    def SendToAll(self, data):
+        [p.Send(data) for p in self.players]
 
     def find_closest_to_target(self):
         closest = Fortune_ball(Vector2(-1234, -1234), (0, 0))
@@ -25,47 +93,11 @@ class Game_of_luck:
                 closest = ball
         return closest
 
-
-    def start_game(self):
-
-        # pygame.init()
-        # screen = pygame.display.set_mode((800, 600))
-
-        closest = self.wheel.balls[0]
-        should_stop = False
-        slowdown = Game_of_luck.SLOWDOWN
-        while True:
-            self.clock.tick(Game_of_luck.FPS)
-            self.wheel.rotate(self.wheel.speed / 100)
-            self.wheel.speed -= slowdown
-
-            if self.wheel.speed <= 30 and should_stop is False:
-                closest = self.find_closest_to_target()
-                if closest.vector[0] != -1234:
-                    self.wheel.speed = 30
-                    slowdown = 0
-                    should_stop = True
-
-            if should_stop is True:
-                if closest.vector[0] > 0:
-                    if closest.type == "bad_luck":
-                        return False
-                    else:
-                        return True
-
-            # renderer.draw_everything(screen, self.generate_coordinates())
-            # pygame.display.update()
-
-
     def generate_coordinates(self):
         coordinates = ([ball.generate_coordinates() for ball in self.wheel.balls])
         coordinates.insert(0, ("gradient_white", 0, 0))
         coordinates.append(("arrow_of_fortune", 400, 55))
-        print(coordinates)
         return coordinates
-
-    # def to_json():
-        #return "arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([ball.to_json() + "\n" for ball in self.wheel.balls])
 
 
 class Wheel_of_fortune:
@@ -87,8 +119,6 @@ class Wheel_of_fortune:
         for i in range(good_balls_count):
             self.balls[i].type = "good_luck"
 
-
-
     def rotate(self, angle):
         for ball in self.balls:
             ball.vector.rotate_ip(angle)
@@ -103,9 +133,15 @@ class Fortune_ball:
     def generate_coordinates(self):
         return (self.type, self.vector.x + self.wheel_center[0], self.vector.y + self.wheel_center[1])
    
-   # def to_json():
-        #return self.type + "\n" + str(self.vector.x + self.wheel_center[0]) + "\n" + str(self.vector.y + self.wheel_center[1]) + "\n"
+if __name__ == "__main__":
+    # get command line argument of server, port
+    if len(sys.argv) != 2:
+        print("Usage: {0} host:port".format(sys.argv[0]))
+        print("e.g. {0} localhost:31425".format(sys.argv[0]))
+    else:
+        host, port = sys.argv[1].split(":")
+        s = Game_of_luck(localaddr=(host, int(port)))
+        difficulty = 3
+        s.Launch(difficulty)
 
-# game = Game_of_luck(7)
-# game.start_game()
-# # print(game.generate_coordinates())
+
