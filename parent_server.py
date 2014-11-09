@@ -90,8 +90,8 @@ if __name__ == "__main__":
     # else:
     #host, port = sys.argv[1].split(":")
 
-    s = GameServer(localaddr=('localhost', 22022))
-    s.current_game = kick_ball.Game(5)
+    s = GameServer(localaddr=('10.0.201.111', 22022))
+
 
     #s.urrent_game = maze_game.MazeGame(5)
     s.Launch()

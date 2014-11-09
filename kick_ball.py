@@ -1,7 +1,7 @@
 __author__ = 'Stoyan'
 
 from pygame.locals import *
-import pygame
+import pygame.rect, pygame.mask
 import math
 import json
 import sys
@@ -86,6 +86,7 @@ class Game:
         self.newimg = self.ball.image
         self.tries = TRIES
         self.game_over = False
+        self.clock = pygame.time.Clock()
 
     def check_for_collision(self):
         if pygame.sprite.collide_mask(self.pointer, self.ball) and not self.paused:
@@ -127,15 +128,10 @@ class Game:
             self.ball.dx = -self.ball.dx * self.ball.bounce
             self.ball.spin = -self.ball.dy
 
+        self.ball.update()
+
         if self.score > self.highscore:
             self.highscore = self.score
-
-        self.ball.update()
-        rotated = pygame.transform.rotate(self.ball.image, self.ball.angle)
-        size = rotated.get_size()
-        self.subrect.centerx = size[0] / 2
-        self.subrect.centery = size[1] / 2
-        self.newimg = rotated.subsurface(self.subrect)
 
         if self.tries == 0:
             self.game_over = True
@@ -144,7 +140,9 @@ class Game:
         return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
 
     def generate_coordinates(self):
-        return self.ball.get_coordinates()
+        coords = self.ball.get_coordinates()#
+        coords.insert(0, ("ball_background", 0, 0))
+        return coords
 
     def additional_params(self):
         return {}
@@ -153,6 +151,7 @@ class Game:
         pass
 
     def iter(self, keyboard_input=None, mouse_input=None):
+        #self.clock.tick(100)
         print(mouse_input)
         if mouse_input is not None:
             self.pointer.rect.x, self.pointer.rect.y = mouse_input[0], mouse_input[1]

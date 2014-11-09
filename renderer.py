@@ -19,5 +19,4 @@ def draw_everything(surface, objects):
                 subrect.centery = size[1] // 2
                 newimg = rotated.subsurface(subrect)
                 img = newimg
-            print(obj[1], obj[2])
             surface.blit(img, (obj[1], obj[2]))
