@@ -17,7 +17,7 @@ class Client(ConnectionListener):
             exit()
 
     def Loop(self):
-        connection.Send({'action': 'handle_input', 'input' : pygame.key.get_pressed()})
+        connection.Send({'action': 'handle_input', 'keyboard_input' : pygame.key.get_pressed(), 'mouse_input' : pygame.mouse.get_pos()})
         connection.Pump()
         self.Pump()
 
