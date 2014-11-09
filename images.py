@@ -12,5 +12,5 @@ images = {
             "maze_win" : pygame.transform.scale(pygame.image.load("images/maze_win.png"), (16, 16)),
             "ball": pygame.image.load("images/ball.png"),
             "gradient_white" : pygame.image.load("images/gradient_white.png"),
-            "ball_background" : pygame.image.load("images/ball_background.jpg")
+            "ball_background" : pygame.image.load("images/ball_background.png")
         }
