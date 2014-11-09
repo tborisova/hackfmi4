@@ -6,8 +6,8 @@ second_player_text = TextBox(
     (200, 50), (600, 40), "Player 2", (0, 0, 0), (r"kick-ball/data/font.ttf", 100))
 maze_button = Button(
     "default", (255, 50), (155, 300), "Maze Runner", None, (0, 0, 0), (None, 100))
-maze_input = InputBox(
-    (70, 35), (343, 300), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+maze_input = InputBox((70, 35), (343, 300), "000",
+                      (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
 game_of_luck_button = Button(
     "default", (255, 50), (155, 380), "Game of Luck", None, (0, 0, 0), (None, 100))
 game_of_luck_input = InputBox(

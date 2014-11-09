@@ -17,20 +17,27 @@ class ClientChannel(Channel):
     def __init__(self, *args, **kwargs):
         self.nickname = "anonymous"
         Channel.__init__(self, *args, **kwargs)
-  
+
     def Close(self):
         self._server.game_over = True
         self._server.DelPlayer(self)
-  
+
     def Network_print_game_state(self, data):
         self._server.update(self)
-        self._server.SendToAll({'action': 'game_state', 'get_json': self._server.get_json(), 'score': self._server.score, 
-                               'newimg_angle': self._server.ball.angle, 'ball_rect_x': self._server.ball.rect.x, 'ball_rect_y': self._server.ball.rect.y, 
-                               'ball_rect_h': self._server.ball.rect.height, 'ball_rect_w': self._server.ball.rect.width, 'highscore': self._server.highscore})
-                               
+        self._server.SendToAll({'action': 'game_state',
+                                'get_json': self._server.get_json(),
+                                'score': self._server.score,
+                                'newimg_angle': self._server.ball.angle,
+                                'ball_rect_x': self._server.ball.rect.x,
+                                'ball_rect_y': self._server.ball.rect.y,
+                                'ball_rect_h': self._server.ball.rect.height,
+                                'ball_rect_w': self._server.ball.rect.width,
+                                'highscore': self._server.highscore})
+
     def Network_mouse_pos(self, data):
         self._server.pointer.rect.x = data['x']
         self._server.pointer.rect.y = data['y']
+
 
 class Ball(pygame.sprite.Sprite):
 
@@ -81,10 +88,15 @@ class Ball(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+
 class Pointer(pygame.sprite.Sprite):
 
     def __init__(self):
-        self.rect = pygame.Rect(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 1, 1)
+        self.rect = pygame.Rect(
+            pygame.mouse.get_pos()[0],
+            pygame.mouse.get_pos()[1],
+            1,
+            1)
         self.mask = pygame.Mask((1, 1))
         self.mask.set_at((0, 0), 1)
 
@@ -101,7 +113,7 @@ class Game(Server):
     def AddPlayer(self, player):
         self.players[player] = True
         self.SendPlayers()
-    
+
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
 
@@ -124,12 +136,20 @@ class Game(Server):
         self.game_over = False
 
     def check_for_collision(self):
-        if pygame.sprite.collide_mask(self.pointer, self.ball) and not self.paused:
-            if self.ball.mask.get_at((int(self.pointer.rect.x - self.ball.x), int(self.pointer.rect.y - self.ball.y))):
-                hit = self.ball.mask.overlap(
-                    self.pointer.mask, (int(self.pointer.rect.x - self.ball.x), int(self.pointer.rect.y - self.ball.y)))
+        if pygame.sprite.collide_mask(
+                self.pointer,
+                self.ball) and not self.paused:
+            if self.ball.mask.get_at(
+                    (int(self.pointer.rect.x - self.ball.x), int(self.pointer.rect.y - self.ball.y))):
+                hit = self.ball.mask.overlap(self.pointer.mask, (int(
+                    self.pointer.rect.x - self.ball.x), int(self.pointer.rect.y - self.ball.y)))
                 hit = (
-                    hit[0] - self.ball.rect.width / 2, hit[1] - self.ball.rect.height / 2)
+                    hit[0] -
+                    self.ball.rect.width /
+                    2,
+                    hit[1] -
+                    self.ball.rect.height /
+                    2)
                 angle = math.degrees(math.atan2(hit[0], hit[1]))
                 dx = 30 * math.cos(math.radians(angle + 90))
                 dy = 30 * math.sin(math.radians(angle - 90))
@@ -165,18 +185,21 @@ class Game(Server):
 
         if self.score > self.highscore:
             self.highscore = self.score
-        
+
         self.ball.update()
         print(self.tries)
-        
+
         if self.tries == 0:
             self.game_over = True
-            self.SendToAll({'action': 'game_over', 'data' : self.get_json(), 'highscore': self.highscore})
+            self.SendToAll({'action': 'game_over',
+                            'data': self.get_json(),
+                            'highscore': self.highscore})
             self.DelPlayer(player)
             pygame.quit()
 
     def get_json(self):
-        return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
+        return json.dumps(
+            {'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
 
     def Launch(self):
         while True:
@@ -191,4 +214,3 @@ if __name__ == "__main__":
         host, port = sys.argv[1].split(":")
         s = Game(localaddr=(host, int(port)))
         s.Launch()
-
