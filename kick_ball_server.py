@@ -104,6 +104,9 @@ class Pointer(pygame.sprite.Sprite):
 class Game(Server):
     channelClass = ClientChannel
 
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
+
     def Connected(self, channel, addr):
         if self.current_index < 2:
             self.AddPlayer(channel)
