@@ -3,6 +3,7 @@ import random
 import json
 import time
 import pygame
+from get_ip import check_for_internet_conection as get_ip
 import time
 from event_handler import unparse
 
@@ -70,12 +71,6 @@ class ClientMaze(ConnectionListener):
         pygame.display.update()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425", sys.argv[0])
-    else:
-        host, port = sys.argv[1].split(":")
-        c = ClientMaze(host, int(port))
-        while True:
-            c.Loop()
-            sleep(0.01)
+    host = get_ip()
+    s = ClientMaze(host, int(31425))
+    s.Loop()

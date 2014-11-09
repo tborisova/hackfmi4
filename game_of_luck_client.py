@@ -5,6 +5,7 @@ import time
 import pygame
 import time
 from renderer import draw_everything
+from get_ip import check_for_internet_conection as get_ip
 from event_handler import unparse
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
@@ -53,12 +54,6 @@ class ClientLuck(ConnectionListener):
             exit()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425", sys.argv[0])
-    else:
-        host, port = sys.argv[1].split(":")
-        c = ClientLuck(host, int(port))
-        while True:
-            c.Loop()
-            sleep(0.01)
+    host = get_ip()
+    s = ClientLuck(host, int(31425))
+    s.Loop()

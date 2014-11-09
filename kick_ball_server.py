@@ -2,6 +2,8 @@ from pygame.locals import *
 import pygame
 import math
 import json
+import socket
+from get_ip import check_for_internet_conection as get_ip
 import sys
 
 from time import sleep, localtime
@@ -116,7 +118,6 @@ class Game(Server):
 
     def AddPlayer(self, player):
         self.players[player] = True
-        self.SendPlayers()
         self.players_order[player] = self.current_index
         self.current_index += 1
 
@@ -174,7 +175,7 @@ class Game(Server):
             self.ball.dx = -self.ball.dx * self.ball.friction
             self.ball.spin = self.ball.dy
         if self.ball.y > WINDOWHEIGHT - self.ball.rect.height:
-            if not self.paused and self.score > 0:
+            if self.score > 0:
                 self.tries -= 1
                 self.score = 0
             self.ball.y = WINDOWHEIGHT - self.ball.rect.height
@@ -197,7 +198,7 @@ class Game(Server):
         self.ball.update()
         print(self.tries)
 
-        if self.tries == 0:
+        if self.tries <= 0:
             self.game_over = True
             self.SendToAll({'action': 'game_over',
                             'data': self.get_json(),
@@ -215,5 +216,6 @@ class Game(Server):
             sleep(0.0001)
 
 if __name__ == "__main__":
-    s = Game(localaddr=('10.0.201.111', int(31425)))
+    host = get_ip()
+    s = Game(localaddr=(host, int(31425)))
     s.Launch()

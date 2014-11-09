@@ -5,7 +5,7 @@ import sys
 
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
-
+from get_ip import check_for_internet_conection as get_ip
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
 
@@ -159,11 +159,6 @@ class Fortune_ball:
             self.wheel_center[1])
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425".format(sys.argv[0]))
-    else:
-        host, port = sys.argv[1].split(":")
-        s = Game_of_luck(localaddr=(host, int(port)))
-        difficulty = 3
-        s.Launch(difficulty)
+    host = get_ip()
+    s = Game_of_luck(localaddr=(host, int(31425)))
+    s.Launch(5)

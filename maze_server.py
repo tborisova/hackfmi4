@@ -4,6 +4,7 @@ import time
 import pygame
 import sys
 import time
+from get_ip import check_for_internet_conection as get_ip
 from renderer import draw_everything
 from event_handler import unparse
 from time import sleep, localtime
@@ -289,11 +290,6 @@ class MazeGame(Server):
         self.players[player] = False
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425".format(sys.argv[0]))
-    else:
-        host, port = sys.argv[1].split(":")
-        s = MazeGame(localaddr=(host, int(port)))
-        difficulty = 3
-        s.Launch(difficulty)
+    host = get_ip()
+    s = MazeGame(localaddr=(host, int(31425)))
+    s.Launch(5)

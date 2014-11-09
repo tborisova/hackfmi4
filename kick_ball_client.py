@@ -3,6 +3,7 @@ import pygame
 import math
 import json
 import sys
+from get_ip import check_for_internet_conection as get_ip
 
 from kick_ball_server import Game
 from settings import *
@@ -19,7 +20,8 @@ class Gui(ConnectionListener):
         pygame.display.set_caption('Kick Ball')
         pygame.display.set_icon(pygame.image.load(IMAGES_PATH + 'icon.png'))
         self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        self.screen.fill((0, 0, 0))
+        self.screen.blit(
+            pygame.image.load(IMAGES_PATH + 'ball_background.png'), (0, 0))
         self.screen_center = (WINDOWWIDTH / 2, WINDOWHEIGHT / 2)
         self.clock = pygame.time.Clock()
         self.font1 = pygame.font.Font(FONTS_PATH + 'font.tff', 40)
@@ -102,7 +104,7 @@ class Gui(ConnectionListener):
             data['ball_rect_y'],
             data['ball_rect_w'],
             data['ball_rect_h'])
-        img = pygame.image.load('./images/ball.png')
+        img = pygame.image.load(IMAGES_PATH + 'ball.png')
         rotated = pygame.transform.rotate(img, data['newimg_angle'])
         size = rotated.get_size()
         subrect = img.get_rect()
@@ -114,7 +116,6 @@ class Gui(ConnectionListener):
         self.screen.blit(rotated_img, rect)
 
 if __name__ == "__main__":
-        c = Gui(10, "10.0.201.111", int(31425))
-        while True:
-            c.Loop()
-            sleep(0.001)
+    host = get_ip()
+    s = Game(localaddr=(host, int(31425)))
+    s.Launch()
