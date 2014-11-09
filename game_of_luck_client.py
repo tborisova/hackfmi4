@@ -47,12 +47,12 @@ class ClientLuck(ConnectionListener):
 
       for event in pygame.event.get():
           if event.type == pygame.QUIT:
-              sys.exit()
+              exit()
       pygame.display.update()
 
       if data['should_stop']:
         return data['closest_type']
-        sys.exit()
+        exit()
       
 if __name__ == "__main__": 
     if len(sys.argv) != 2:
