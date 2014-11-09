@@ -1,5 +1,4 @@
 import sys
-import game_of_luck
 #from event_handler import unparse
 
 from weakref import WeakKeyDictionary
@@ -8,7 +7,7 @@ from time import sleep, localtime
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
 
-
+import kick_ball
 import game_of_luck
 
 
@@ -24,8 +23,9 @@ class ClientChannel(Channel):
         self._server.current_game = data['game'] # this is a string, should be made into class - search how 
 
     def Network_handle_input(self, data):
-        if self._server.player_can_write(self):
-            self._server.handle_input(data)
+        print(data)
+        # if self._server.player_can_write(self):
+        self._server.handle_input(data['keyboard_input'], data['mouse_input'])
         self._server.SendToAll({'action' : 'draw_everything', 'objects' : self._server.current_game.generate_coordinates(), 'additional_params' : self._server.current_game.additional_params()})
 
 
@@ -35,14 +35,14 @@ class GameServer(Server):
 
     def __init__(self, *args, **kwargs):
         Server.__init__(self, *args, **kwargs)
-        print(args)
-        print(kwargs)
+      #  print(args)
+      #  print(kwargs)
         self.players_order = WeakKeyDictionary()
         self.players = WeakKeyDictionary()
         self.current_index = 0
         print('Server launched')
         self.main_application = None #... not None ...
-        self.current_game = game_of_luck.Game_of_luck(5)
+        self.current_game = kick_ball.Game(5)
 
     def player_can_write(self, channel):
         return self.players_order[channel] == 0
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     #host, port = sys.argv[1].split(":")
 
     s = GameServer(localaddr=('10.0.201.111', 22022))
-    s.current_game = game_of_luck.Game_of_luck(5)
+    s.current_game = kick_ball.Game(5)
 
     #s.urrent_game = maze_game.MazeGame(5)
     s.Launch()

@@ -50,6 +50,8 @@ class MazeGame:
         self.displacement_y = self.height // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
         self.clock = pygame.time.Clock()
 
+        
+
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
         if cell_y + 1 < len(self.maze) and not self.maze[cell_x][cell_y + 1].was_visited:
@@ -198,12 +200,6 @@ class MazeGame:
 
 
     def start_game(self):
-        pygame.init()
-        #
-        screen = pygame.display.set_mode((800, 600))
-        
-        start = time.time()
-        self.difference = 0
         while True:
             self.clock.tick(60)
             #keys = pygame.key.get_pressed()

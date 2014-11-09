@@ -65,6 +65,7 @@ class Ball(pygame.sprite.Sprite):
 class Pointer(pygame.sprite.Sprite):
 
     def __init__(self):
+        pygame.init()
         self.rect = pygame.Rect(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 1, 1)
         self.mask = pygame.Mask((1, 1))
         self.mask.set_at((0, 0), 1)
@@ -152,7 +153,9 @@ class Game:
         pass
 
     def iter(self, keyboard_input=None, mouse_input=None):
-        self.pointer.rect.x, self.pointer.rect.y = mouse_input[0], mouse_input[1]
+        print(mouse_input)
+        if mouse_input is not None:
+            self.pointer.rect.x, self.pointer.rect.y = mouse_input[0], mouse_input[1]
         self.update()
         if not self.game_over:
             return None
@@ -195,6 +198,7 @@ class Gui:
                 return self.game.highscore
 
     def handle_game_event(self):
+        pass
         # for event in pygame.event.get():
         #         if event.type == QUIT:
         #             pygame.quit()
