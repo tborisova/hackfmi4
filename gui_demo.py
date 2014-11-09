@@ -9,9 +9,10 @@ screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
 first_player_text = gui_elements.TextBox(
-    (200, 50), (200, 40), "Player 1", (0, 0, 0), (r"kick-ball/data/font.ttf", 100))
+    (200, 50), (200, 40), "Player 1", (0, 0, 0), (r"./data/font.ttf", 100))
 second_player_text = gui_elements.TextBox(
-    (200, 50), (600, 40), "Player 2", (0, 0, 0), (r"kick-ball/data/font.ttf", 100))
+    (200, 50), (600, 40), "Player 2", (0, 0, 0), (r"./data/font.ttf", 100))
+
 maze_button = gui_elements.Button(
     "default", (255, 50), (155, 300), "Maze Runner", None, (0, 0, 0), (None, 100))
 maze_input = gui_elements.InputBox(
@@ -25,9 +26,25 @@ kick_the_ball_button = gui_elements.Button(
 kick_the_ball_input = gui_elements.InputBox(
     (70, 35), (343, 460), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
 
+maze_button2 = gui_elements.Button(
+    "default", (255, 50), (555, 300), "Maze Runner", None, (0, 0, 0), (None, 100))
+maze_input2 = gui_elements.InputBox(
+    (70, 35), (743, 300), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
 
-input_boxes = [maze_input, game_of_luck_input, kick_the_ball_input]
-buttons = [maze_button, game_of_luck_button, kick_the_ball_button]
+game_of_luck_button2 = gui_elements.Button(
+    "default", (255, 50), (555, 380), "Game of Luck", None, (0, 0, 0), (None, 100))
+game_of_luck_input2 = gui_elements.InputBox(
+    (70, 35), (743, 380), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+
+kick_the_ball_button2 = gui_elements.Button(
+    "default", (255, 50), (555, 460), "Kick the Ball", None, (0, 0, 0), (None, 100))
+kick_the_ball_input2 = gui_elements.InputBox(
+    (70, 35), (743, 460), "000", (0, 0, 0), (None, 40), (255, 255, 255), (0, 0, 0), 1)
+
+
+
+input_boxes = [maze_input, game_of_luck_input, kick_the_ball_input, maze_input2, game_of_luck_input2, kick_the_ball_input2]
+buttons = [maze_button, game_of_luck_button, kick_the_ball_button, maze_button2, game_of_luck_button2, kick_the_ball_button2]
 text_boxes = [first_player_text, second_player_text]
 views = input_boxes + buttons + text_boxes
 
