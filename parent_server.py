@@ -24,7 +24,8 @@ class ClientChannel(Channel):
         self._server.current_game = data['game'] # this is a string, should be made into class - search how 
 
     def Network_handle_input(self, data):
-        self._server.handle_input(data)
+        if self._server.player_can_write(self):
+            self._server.handle_input(data)
         self._server.SendToAll({'action' : 'draw_everything', 'objects' : self._server.current_game.generate_coordinates(), 'additional_params' : self._server.current_game.additional_params()})
 
 
@@ -34,19 +35,26 @@ class GameServer(Server):
 
     def __init__(self, *args, **kwargs):
         Server.__init__(self, *args, **kwargs)
+        print(args)
+        print(kwargs)
+        self.players_order = WeakKeyDictionary()
         self.players = WeakKeyDictionary()
+        self.current_index = 0
         print('Server launched')
-        #
         self.main_application = None #... not None ...
         self.current_game = game_of_luck.Game_of_luck(5)
 
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
 
     def Connected(self, channel, addr):
-        self.AddPlayer(channel)
+        if self.current_index < 2:
+            self.AddPlayer(channel)
 
     def AddPlayer(self, player):
         self.players[player] = True
-        # self.SendToPlayers()
+        self.players_order[player] = self.current_index
+        self.current_index += 1
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
@@ -64,7 +72,7 @@ class GameServer(Server):
                 self.current_game = None
                 # self.SendToAll({'action' : 'draw_everything', 'objects' : self.main_application.generate_coordinates()})
                 sys.exit()
-
+#exit
         else:
             #
             pass
