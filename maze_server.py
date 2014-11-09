@@ -74,7 +74,7 @@ class ClientChannel(Channel):
                                 'time_is_up': self._server.time_is_up()})
 
     def Network_player_move(self, data):
-        if self._server.player_can_write(self)
+        if self._server.player_can_write(self):
             self._server.player.move(data['move'])
 
 
