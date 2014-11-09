@@ -23,7 +23,6 @@ class ClientChannel(Channel):
         self._server.current_game = data['game'] # this is a string, should be made into class - search how 
 
     def Network_handle_input(self, data):
-        print(data)
         # if self._server.player_can_write(self):
         self._server.handle_input(data['keyboard_input'], data['mouse_input'])
         self._server.SendToAll({'action' : 'draw_everything', 'objects' : self._server.current_game.generate_coordinates(), 'additional_params' : self._server.current_game.additional_params()})

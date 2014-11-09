@@ -111,7 +111,7 @@ class Game:
             self.ball.spin = self.ball.dy
         if self.ball.y > WINDOWHEIGHT - self.ball.rect.height:
             if not self.paused and self.score > 0:
-                self.tries -= 1
+                self.tries = 1
                 self.score = 0
             self.ball.y = WINDOWHEIGHT - self.ball.rect.height
             if not self.ball.on_ground:
