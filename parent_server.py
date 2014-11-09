@@ -23,10 +23,7 @@ class ClientChannel(Channel):
         self._server.current_game = data['game'] # this is a string, should be made into class - search how 
 
     def Network_handle_input(self, data):
-
-        if self._server.player_can_write(self):
-            self._server.handle_input(data['keyboard_input'], data['mouse_input'])
-
+        self._server.handle_input(data['keyboard_input'], data['mouse_input'])
         self._server.SendToAll({'action' : 'draw_everything', 'objects' : self._server.current_game.generate_coordinates(), 'additional_params' : self._server.current_game.additional_params()})
 
 
@@ -54,6 +51,7 @@ class GameServer(Server):
         self.players[player] = True
         self.players_order[player] = self.current_index
         self.current_index += 1
+        player.Send({'action': 'connected', 'current_index': self.current_index - 1})
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
