@@ -33,7 +33,7 @@ class Game_of_luck:
                 closest = ball
         return closest
 
-    def iter(self, input):
+    def iter(self, keyboard_input, mouse_input):
         self.clock.tick(Game_of_luck.FPS)
         self.wheel.rotate(self.wheel.speed / 100)
         self.wheel.speed -= self.slowdown

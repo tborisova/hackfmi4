@@ -57,9 +57,9 @@ class GameServer(Server):
             self.Pump()
             sleep(0.0001)
 
-    def handle_input(self, input):
+    def handle_input(self, keyboard_intput=None, mouse_input=None):
         if self.current_game is not None:
-            result = self.current_game.iter(input)
+            result = self.current_game.iter(keyboard_intput, mouse_input)
             if result is not None:
                 self.current_game = None
                 # self.SendToAll({'action' : 'draw_everything', 'objects' : self.main_application.generate_coordinates()})
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # else:
     #host, port = sys.argv[1].split(":")
 
-    s = GameServer(localaddr=('localhost', 22022))
+    s = GameServer(localaddr=('10.0.201.111', 22022))
     s.current_game = game_of_luck.Game_of_luck(5)
 
     #s.urrent_game = maze_game.MazeGame(5)
