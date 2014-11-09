@@ -23,12 +23,11 @@ class ClientChannel(Channel):
         self._server.DelPlayer(self)
   
     def Network_print_game_state(self, data):
-        self._server.update()
+        self._server.update(self)
         self._server.SendToAll({'action': 'game_state', 'get_json': self._server.get_json(), 'score': self._server.score, 
                                'newimg_angle': self._server.ball.angle, 'ball_rect_x': self._server.ball.rect.x, 'ball_rect_y': self._server.ball.rect.y, 
                                'ball_rect_h': self._server.ball.rect.height, 'ball_rect_w': self._server.ball.rect.width, 'highscore': self._server.highscore})
-                               #'mouse_x': self._server.pointer.rect.x, 'mouse_y': self._server.pointer.rect.y})
-
+                               
     def Network_mouse_pos(self, data):
         self._server.pointer.rect.x = data['x']
         self._server.pointer.rect.y = data['y']
@@ -93,21 +92,15 @@ class Pointer(pygame.sprite.Sprite):
 class Game(Server):
     channelClass = ClientChannel
 
-    # this is called when a player is connected
     def Connected(self, channel, addr):
-        print("WEILL DD NEW player")
         self.AddPlayer(channel)
 
     def DelPlayer(self, player):
-        del self.players[player]
-        self.SendPlayers()
+        self.players[player] = False
 
     def AddPlayer(self, player):
         self.players[player] = True
         self.SendPlayers()
-
-    def SendPlayers(self):
-        self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
     
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
@@ -146,7 +139,7 @@ class Game(Server):
                 self.ball.spin = -dx / 5
                 self.score += 1
 
-    def update(self):
+    def update(self, player):
         self.check_for_collision()
         if self.ball.x > WINDOWWIDTH - self.ball.rect.width:
             self.ball.x = WINDOWWIDTH - self.ball.rect.width
@@ -154,7 +147,7 @@ class Game(Server):
             self.ball.spin = self.ball.dy
         if self.ball.y > WINDOWHEIGHT - self.ball.rect.height:
             if not self.paused and self.score > 0:
-                self.tries = 1
+                self.tries -= 1
                 self.score = 0
             self.ball.y = WINDOWHEIGHT - self.ball.rect.height
             if not self.ball.on_ground:
@@ -179,8 +172,8 @@ class Game(Server):
         if self.tries == 0:
             self.game_over = True
             self.SendToAll({'action': 'game_over', 'data' : self.get_json(), 'highscore': self.highscore})
+            self.DelPlayer(player)
             pygame.quit()
-            sys.exit()
 
     def get_json(self):
         return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
@@ -191,7 +184,6 @@ class Game(Server):
             sleep(0.0001)
 
 if __name__ == "__main__":
-    # get command line argument of server, port
     if len(sys.argv) != 2:
         print("Usage: {0} host:port".format(sys.argv[0]))
         print("e.g. {0} localhost:31425".format(sys.argv[0]))

@@ -3,6 +3,7 @@ import pygame.time
 import random
 import sys
 
+<<<<<<< HEAD:game_of_luck.py
 
 # # del------------------------------------------------del
 # import pygame
@@ -14,6 +15,33 @@ import sys
 
 class Game_of_luck:
 
+from time import sleep, localtime
+from weakref import WeakKeyDictionary
+
+from PodSixNet.Server import Server
+from PodSixNet.Channel import Channel
+
+class ClientChannel(Channel):
+    
+    def __init__(self, *args, **kwargs):
+        self.nickname = "anonymous"
+        Channel.__init__(self, *args, **kwargs)
+  
+    def Close(self):
+        self._server.DelPlayer(self)
+    
+    def Network_print_game_state(self, data):
+        data1 = self._server.do_stuff()        
+        
+        objects = self._server.generate_coordinates()
+        self._server.SendToAll({'action': 'render_game_state', 'objects': objects, 'should_stop': data1['should_stop'], 'closest_type': data1['closest_type']})
+
+    def Network_player_move(self, data):
+        self._server.player.move(data['move'])
+
+class Game_of_luck(Server):
+
+    channelClass = ClientChannel
     FPS = 60
     WHEEL_CENTER = (400, 300)
     SLOWDOWN = 6
@@ -56,12 +84,11 @@ class Game_of_luck:
     def additional_params(self):
         return {}
 
+    def AddPlayer(self, player):
+        self.players[player] = True
 
-    # def start_game(self):
-    #     while True:
-    #         self.clock.tick(Game_of_luck.FPS)
-    #         self.wheel.rotate(self.wheel.speed / 100)
-    #         self.wheel.speed -= self.slowdown
+    def DelPlayer(self, player):
+        self.players[player] = False
 
     #         if self.wheel.speed <= 30 and self.should_stop is False:
     #             self.closest = self.find_closest_to_target()
@@ -108,8 +135,7 @@ class Wheel_of_fortune:
     def __init__(self, good_balls_count, center):
         self.center = center
         self.good_balls_count = good_balls_count
-        self.speed = random.randint(800, 1200)
-        #self.speed = random.randint(400, 700)
+        self.speed = random.randint(400,800)
         self.balls = [Fortune_ball(Vector2(0, Wheel_of_fortune.RADIUS).rotate((i * 360) / \
                                               Wheel_of_fortune.BALLS_COUNT), \
                                               center) \
@@ -136,18 +162,14 @@ class Fortune_ball:
     def generate_coordinates(self):
         return (self.type, self.vector.x + self.wheel_center[0], self.vector.y + self.wheel_center[1])
 
-    # to json
-    # def __str__(self):
-    #     return json.dumps({str(id(self)) : {'image' : self.type, 'x' : self.vector[0] + self.wheel_center[0], \
-    #         'y': self.vector[1] + self.wheel_center[1]}})[1:][:-1]
+   
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: {0} host:port".format(sys.argv[0]))
+        print("e.g. {0} localhost:31425".format(sys.argv[0]))
+    else:
+        host, port = sys.argv[1].split(":")
+        s = Game_of_luck(localaddr=(host, int(port)))
+        difficulty = 3
+        s.Launch(difficulty)
 
-
-# #test ------------------------------   ///////////////////////
-# game = Game_of_luck(3)
-# while True:
-#     a = game.iter(None)
-#     if a is not None:
-#         break
-#     print(game.generate_coordinates())
-# #print(game.wheel.balls[0])
-# #-----------------------

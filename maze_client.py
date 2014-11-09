@@ -4,7 +4,6 @@ import json
 import time
 import pygame
 import time
-from renderer import draw_everything
 from event_handler import unparse
 
 from renderer import draw_everything
@@ -50,20 +49,16 @@ class ClientMaze(ConnectionListener):
       elif data['time_is_up']:
           sys.exit()
       if keys[pygame.K_LEFT]:
-          move = 'left'
-          connection.Send({'action': 'player_move', 'move': move})
+          connection.Send({'action': 'player_move', 'move': 'left'})
           time.sleep(0.01)
       if keys[pygame.K_RIGHT]:
-          move = 'right'
-          connection.Send({'action': 'player_move', 'move': move})
+          connection.Send({'action': 'player_move', 'move': 'right'})
           time.sleep(0.01)
       if keys[pygame.K_DOWN]:
-          move = 'down'
-          connection.Send({'action': 'player_move', 'move': move})
+          connection.Send({'action': 'player_move', 'move': 'down'})
           time.sleep(0.01)
       if keys[pygame.K_UP]:
-          move = 'up'
-          connection.Send({'action': 'player_move', 'move': move})
+          connection.Send({'action': 'player_move', 'move': 'up'})
           time.sleep(0.01)
 
       draw_everything(self.screen, data['objects'])
