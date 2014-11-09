@@ -6,6 +6,10 @@ import sys
 import time
 from renderer import draw_everything
 from event_handler import unparse
+from time import sleep, localtime
+from weakref import WeakKeyDictionary
+from PodSixNet.Server import Server
+from PodSixNet.Channel import Channel
 
 
 class Cell:
@@ -51,21 +55,49 @@ class Player:
                 self.x += self.cell_size
 
 
-class MazeGame:
+class ClientChannel(Channel):
 
-    def __init__(self, difficulty):
-        self.difficulty = difficulty
-        #self.maze = [[Cell() for i in range(3)] for j in range(3)]
-        self.set_difficulty()
-        self.generate_maze()
-        self.player = Player(self.maze)
+    def __init__(self, *args, **kwargs):
+        self.nickname = "anonymous"
+        Channel.__init__(self, *args, **kwargs)
+
+    def Close(self):
+        self._server.DelPlayer(self)
+
+    def Network_print_game_state(self, data):
+        objects = self._server.generate_coordinates()
+        self._server.end = time.time()
+        self._server.difference = self._server.end - self._server.start
+        self._server.SendToAll({'action': 'render_game_state',
+                                'objects': objects,
+                                'player_wins': self._server.check_if_player_wins(),
+                                'time_is_up': self._server.time_is_up()})
+
+    def Network_player_move(self, data):
+        if self._server.player_can_write(self):
+            self._server.player.move(data['move'])
+
+
+class MazeGame(Server):
+
+    channelClass = ClientChannel
+
+    def __init__(self, *args, **kwargs):
+        pygame.init()
+        Server.__init__(self, *args, **kwargs)
         self.width = 800
         self.height = 600
-        self.displacement_x = self.width // 2 - \
-            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
-        self.displacement_y = self.height // 2 - \
-            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.start = time.time()
+        self.end = 0
+        self.difference = 0
         self.clock = pygame.time.Clock()
+        self.players = WeakKeyDictionary()
+        self.players = WeakKeyDictionary()
+        self.current_index = 0
+        print('Server launched')
+
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
@@ -212,101 +244,13 @@ class MazeGame:
             ("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
-    def image_to_json(self, coordinate):
-        return json.dumps({(str(id(coordinate))): {
-                          'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
-
-    def generate_JSON_string(self):
-        coordinates = self.generate_coordinates()
-        json_dict = {}
-        for index, coordinate in enumerate(coordinates):
-            if coordinate[0] == "clock":
-                # to be implemented
-                continue
-            json_dict[str(id(coordinate))] = {
-                "image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
-        #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
-        #items = "{\"images\" : { " + items + "}"
-        # items = json.dumps({"images": jsons})
-        # items = items.replace('\\', '')
-        # return json.dumps({"images": {"545478940": {"image": "maze_player",
-        # 'x': 30, 'y': 30}}})
-        something = {"images": json_dict}
-        return json.dumps(something)
-
-        # json_string = ''
-        # images = []
-        # for coordinate in coordinates:
-        #     if coordinate[0] == 'clock':
-        #         json_string += json.dumps({str(id(coordinate)): {'clock': coordinate[0], 'time': coordinate[1], 'x': coordinate[2], 'y': coordinate[3]}})
-        #     else:
-        #
-        #     json_string += json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
-        # return json_string
-
     def check_if_player_wins(self):
         if self.player.x == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement and \
                 self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
             return True
 
-    def event_handling(self):
-        events = unparse()
-        if events is not None:
-            if events["left"]:
-                self.player.move("left")
-                # time.sleep(0.1)
-            if events["right"]:
-                self.player.move("right")
-                # time.sleep(0.1)
-            if events["up"]:
-                self.player.move("up")
-                # time.sleep(0.1)
-            if events["down"]:
-                self.player.move("down")
-                # time.sleep(0.1)
-
-    def start_game(self):
-        pygame.init()
-        #screen = pygame.display.set_mode((800, 600))
-        start = time.time()
-        self.difference = 0
-        # print(self.generate_JSON_string())
-        while True:
-            self.clock.tick(60)
-            #keys = pygame.key.get_pressed()
-            # this is to be moved in another module
-            if self.check_if_player_wins():
-                return True
-            end = time.time()
-            self.difference = end - start
-            if self.difference >= self.time:
-                return False
-            # if keys[pygame.K_LEFT]:
-            #     self.player.move("left")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_RIGHT]:
-            #     self.player.move("right")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_DOWN]:
-            #     self.player.move("down")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_UP]:
-            #     self.player.move("up")
-            #     time.sleep(0.1)
-            self.event_handling()
-            #draw_everything(screen, self.generate_coordinates())
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-
-            x = self.generate_JSON_string()
-            # print(x)
-            with open("test_frame.json", "w") as json_file:
-                json_file.write(x)
-
-           # pygame.display.update()
-        return True
+    def time_is_up(self):
+        return self.difference >= self.time
 
     def set_difficulty(self):
         if self.difficulty <= 6:
@@ -316,25 +260,40 @@ class MazeGame:
                          for j in range(int(self.difficulty * 2.3))]
         self.time = 60 + 400 // self.difficulty
 
-    def print(self):
-        # for testing purposes
-        for i in range(len(self.maze)):
-            for j in range(2):
-                for m in range(len(self.maze)):
-                    if j == 0:
-                        if self.maze[i][m].top_wall:
-                            print("+---", end="")
-                        else:
-                            print("+   ", end="")
-                        if m == len(self.maze) - 1:
-                            print("+")
-                    else:
-                        if self.maze[i][m].left_wall:
-                            print("|   ", end="")
-                        else:
-                            print("    ", end="")
-                        if m == len(self.maze) - 1:
-                            print("|")
-        for i in range(len(self.maze)):
-            print("+---", end="")
-        print("+")
+    def Connected(self, channel, addr):
+        if self.current_index < 2:
+            self.AddPlayer(channel)
+
+    def AddPlayer(self, player):
+        self.players[player] = True
+        self.players_order[player] = self.current_index
+        self.current_index += 1
+
+    def SendToAll(self, data):
+        [p.Send(data) for p in self.players]
+
+    def Launch(self, difficulty):
+        self.difficulty = difficulty
+        self.set_difficulty()
+        self.generate_maze()
+        self.player = Player(self.maze)
+        self.displacement_x = self.width // 2 - \
+            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.displacement_y = self.height // 2 - \
+            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        while True:
+            self.Pump()
+            sleep(0.0001)
+
+    def DelPlayer(self, player):
+        self.players[player] = False
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: {0} host:port".format(sys.argv[0]))
+        print("e.g. {0} localhost:31425".format(sys.argv[0]))
+    else:
+        host, port = sys.argv[1].split(":")
+        s = MazeGame(localaddr=(host, int(port)))
+        difficulty = 3
+        s.Launch(difficulty)

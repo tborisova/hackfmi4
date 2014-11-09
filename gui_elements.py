@@ -13,13 +13,24 @@ CURSORS = {"arrow": lambda: pygame.mouse.set_cursor(*pygame.cursors.arrow),
 class InputBox(Rect):
 
     PADDING = 3
-    HANDLED_KEYS = set([pygame.K_DELETE, pygame.K_BACKSPACE,
-                        pygame.K_LEFT, pygame.K_RIGHT]).union(range(
-        pygame.K_a, pygame.K_z + 1))
+    HANDLED_KEYS = set(
+        [
+            pygame.K_DELETE,
+            pygame.K_BACKSPACE,
+            pygame.K_LEFT,
+            pygame.K_RIGHT]).union(
+        range(
+            pygame.K_a,
+            pygame.K_z +
+            1)).union(
+        range(
+            pygame.K_0,
+            pygame.K_9 +
+            1))
 
     def __init__(self, dimensions, pos, text="", text_colour=(0, 0, 0),
                  text_font=(None, 50), bg_colour=(255, 255, 255),
-                 frame_colour=None, frame_size=0):
+                 frame_colour=(0, 0, 0), frame_size=1):
         Rect.__init__(self, (pos[0] - dimensions[0] / 2,
                              pos[1] - dimensions[1] / 2), dimensions)
         self.text = text
@@ -34,6 +45,8 @@ class InputBox(Rect):
         self.put_cursor(self.right)
         self.clicked = False
         self.state = "normal"
+        self.char_limit = None
+        self.handled_chars = InputBox.HANDLED_KEYS
 
     def draw(self, surface):
         if self.bg_colour is not None:
@@ -46,7 +59,6 @@ class InputBox(Rect):
                 self.left + InputBox.PADDING + shift,
                 self.centery - char.get_height() / 2))
             shift += char.get_width()
-        # print(self.state)
         if self.state == "active":
             pygame.draw.rect(surface, self.text_colour, self.input_cursor)
 
@@ -59,14 +71,6 @@ class InputBox(Rect):
                 char_avatar = pygame.transform.scale(
                     char_avatar, (char_avatar.get_width(), self.height))
             self.char_avatars.append(char_avatar)
-
-    def create_text_avatar(self):
-        self.text_avatar = pygame.font.Font(*self.text_font).render(
-            self.text, 20, self.text_colour)
-        if self.text_avatar.get_width() > self.x or \
-           self.text_avatar.get_height() > self.y:
-            self.text_avatar = pygame.transform.scale(
-                self.text_avatar, self.dimensions)
 
     def put_cursor(self, cursor_x):
         error = cursor_x - (self.left + InputBox.PADDING)
@@ -129,13 +133,15 @@ class InputBox(Rect):
             self.text = self.text[:self.cursor_index] + \
                 self.text[self.cursor_index + 1:]
             self.create_char_avatars()
-        elif pygame.K_a <= key and key <= pygame.K_z:
-            self.text = self.text[:self.cursor_index] + chr(key) +\
-                self.text[self.cursor_index:]
-            self.create_char_avatars()
-            self.shift_cursor(1)
+        elif key in self.handled_chars:
+            if self.char_limit is None or self.char_limit > len(self.text):
+                self.text = self.text[:self.cursor_index] + chr(key) +\
+                    self.text[self.cursor_index:]
+                self.create_char_avatars()
+                self.shift_cursor(1)
         elif key == pygame.K_LEFT and self.cursor_index:
             self.shift_cursor(-1)
+
         elif key == pygame.K_RIGHT and self.cursor_index < len(
                 self.char_avatars):
             self.shift_cursor(1)
@@ -163,49 +169,64 @@ class TextBox(Rect):
             self.pos[1] - self.text_avatar.get_height() / 2))
 
     def create_text_avatar(self):
-        InputBox.create_text_avatar(self)
+        self.text_avatar = pygame.font.Font(*self.text_font).render(
+            self.text, 20, self.text_colour)
+        if self.text_avatar.get_width() > self.x - 2 * InputBox.PADDING or \
+           self.text_avatar.get_height() > self.y - 2 * InputBox.PADDING:
+            self.text_avatar = pygame.transform.scale(
+                self.text_avatar, (self.dimensions[0] - 2 * InputBox.PADDING,
+                                   self.dimensions[1] - 2 * InputBox.PADDING))
 
-# class Button(TextBox):
-#
-#     LOADED_IMAGES = {}
-#
-#     def __init__(self, dimensions, pos, text, text_colour=(0, 0, 0),
-#                  text_font=(None, 50), background=None):
-#         pygame.TextBox.__init__(self, dimensions, pos, text, text_colour,
-#                                 text_font)
-#         self.button_type = button_type
-#
-#     def draw(self, surface):
-#         if self.background is not None:
-#             pygame.draw.rect(surface, self.bg_colour, self, 0)
-#         surface.blit(self.text_avatar, (
-#             self.pos[0] - self.text_avatar.get_width() / 2,
-#             self.pos[0] - self.text_avatar.get_height() / 2))
-#
-#     def update_state(self, cursor_pos, event):
-#         cursor_on_inputbox = self.collidepoint(cursor_pos)
-#         if self.state is "active":
-#             if not event:
-#                 if cursor_on_inputbox:
-#                     self.state = "hover"
-#                     self.clicked = True
-#                     CURSORS["textmarker"]()
-# self.sound_effect.play()
-#                 else:
-#                     self.state = "normal"
-#                     CURSORS["arrow"]()
-#         elif self.state is "hover":
-#             if event and cursor_on_inputbox:
-#                 self.state = "active"
-#             elif not cursor_on_inputbox:
-#                 self.state = "normal"
-#                 CURSORS["arrow"]()
-#         else:
-#             if event and cursor_on_inputbox:
-#                 self.state = "active"
-#                 CURSORS["textmarker"]()
-#             elif cursor_on_inputbox:
-#                 self.state = "hover"
-#                 CURSORS["textmarker"]()
-#
-#
+
+class Button(TextBox):
+
+    BUTTON_TYPES = {"default": {"normal": {"background": (160, 6, 8),
+                                           "frame": (0, 0, 0)},
+                                "hover": {"background": (191, 9, 8),
+                                          "frame": (0, 0, 0)},
+                                "active": {"background": (130, 6, 8),
+                                           "frame": (0, 0, 0)}}}
+
+    def __init__(self, button_type, dimensions, pos, text,
+                 background=None, text_colour=(0, 0, 0), text_font=(None, 50),
+                 frame_size=3):
+        TextBox.__init__(self, dimensions, pos, text, text_colour,
+                         text_font)
+        self.button_type = button_type
+        self.frame_size = frame_size
+        self.state_colours = Button.BUTTON_TYPES[button_type]
+        self.state = "normal"
+        self.clicked = False
+        self.background = background
+        if background is not None:
+            self.background = pygame.transform.scale(background, dimensions)
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.state_colours[self.state]["background"],
+                         self)
+        pygame.draw.rect(surface, self.state_colours[self.state]["frame"],
+                         self, self.frame_size)
+        if self.background is not None:
+            pygame.blit(surface, self.topleft)
+        TextBox.draw(self, surface)
+
+    def update_state(self, cursor_pos, event):
+        cursor_on_button = self.collidepoint(cursor_pos)
+        if self.state is "active":
+            if event is not None:
+                if cursor_on_button:
+                    self.state = "hover"
+                else:
+                    self.state = "normal"
+        elif self.state is "hover":
+            if event and cursor_on_button:
+                self.state = "active"
+                self.clicked = True
+            elif not cursor_on_button:
+                self.state = "normal"
+        else:
+            if event and cursor_on_button:
+                self.state = "active"
+                self.clicked = True
+            elif cursor_on_button:
+                self.state = "hover"

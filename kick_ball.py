@@ -1,37 +1,13 @@
+__author__ = 'Stoyan'
+
 from pygame.locals import *
-import pygame
+import pygame.rect, pygame.mask
 import math
 import json
 import sys
 
-from time import sleep, localtime
-from weakref import WeakKeyDictionary
-
-from PodSixNet.Server import Server
-from PodSixNet.Channel import Channel
 from settings import *
 
-
-class ClientChannel(Channel):
-
-    def __init__(self, *args, **kwargs):
-        self.nickname = "anonymous"
-        Channel.__init__(self, *args, **kwargs)
-  
-    def Close(self):
-        self._server.game_over = True
-        self._server.DelPlayer(self)
-  
-    def Network_print_game_state(self, data):
-        self._server.update()
-        self._server.SendToAll({'action': 'game_state', 'get_json': self._server.get_json(), 'score': self._server.score, 
-                               'newimg_angle': self._server.ball.angle, 'ball_rect_x': self._server.ball.rect.x, 'ball_rect_y': self._server.ball.rect.y, 
-                               'ball_rect_h': self._server.ball.rect.height, 'ball_rect_w': self._server.ball.rect.width, 'highscore': self._server.highscore})
-                               #'mouse_x': self._server.pointer.rect.x, 'mouse_y': self._server.pointer.rect.y})
-
-    def Network_mouse_pos(self, data):
-        self._server.pointer.rect.x = data['x']
-        self._server.pointer.rect.y = data['y']
 
 class Ball(pygame.sprite.Sprite):
 
@@ -61,6 +37,9 @@ class Ball(pygame.sprite.Sprite):
         self.x = self.rect.x
         self.y = self.rect.y
 
+    def get_coordinates(self):
+        return [('ball', self.x, self.y, self.angle)]
+
     def update(self):
         self.x += self.dx / 2
         self.y += self.dy / 2
@@ -81,53 +60,24 @@ class Ball(pygame.sprite.Sprite):
             self.spin = -self.dx
         self.rect.x = self.x
         self.rect.y = self.y
-        print("HERE")
-        print(self.angle)
+
 
 class Pointer(pygame.sprite.Sprite):
 
     def __init__(self):
+        pygame.init()
         self.rect = pygame.Rect(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 1, 1)
         self.mask = pygame.Mask((1, 1))
         self.mask.set_at((0, 0), 1)
 
 
-class Game(Server):
-    channelClass = ClientChannel
+class Game:
 
-    # this is called when a player is connected
-    def Connected(self, channel, addr):
-        self.AddPlayer(channel)
-
-    def DelPlayer(self, player):
-        # print("Deleting Player {0}".format(str(player.addr)))
-        del self.players[player]
-        self.SendPlayers()
-
-    def AddPlayer(self, player):
-        # if len(self.players) < 2:
-        # print("New Player {0}".format(str(player.addr)))
-        self.players[player] = True
-        self.SendPlayers()
-        # print("players {0}".format([p for p in self.players]))
-
-    def SendPlayers(self):
-        self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
-    
-    def SendToAll(self, data):
-        # print("HERE")
-        # print(data)
-        [p.Send(data) for p in self.players]
-
-    def __init__(self, *args, **kwargs):
-        pygame.init()
-        Server.__init__(self, *args, **kwargs)
-        self.players = WeakKeyDictionary()
-        print('Server launched')
+    def __init__(self, difficulty):
         self.ball = Ball(*CENTER)
         self.pointer = Pointer()
         self.score = 0
-        self.difficulty = 3
+        self.difficulty = difficulty
         self.highscore = 0
         self.paused = False
         self.subrect = self.ball.image.get_rect()
@@ -136,6 +86,7 @@ class Game(Server):
         self.newimg = self.ball.image
         self.tries = TRIES
         self.game_over = False
+        self.clock = pygame.time.Clock()
 
     def check_for_collision(self):
         if pygame.sprite.collide_mask(self.pointer, self.ball) and not self.paused:
@@ -161,7 +112,7 @@ class Game(Server):
             self.ball.spin = self.ball.dy
         if self.ball.y > WINDOWHEIGHT - self.ball.rect.height:
             if not self.paused and self.score > 0:
-                self.tries -= 1
+                self.tries = 1
                 self.score = 0
             self.ball.y = WINDOWHEIGHT - self.ball.rect.height
             if not self.ball.on_ground:
@@ -177,37 +128,109 @@ class Game(Server):
             self.ball.dx = -self.ball.dx * self.ball.bounce
             self.ball.spin = -self.ball.dy
 
+        self.ball.update()
+
         if self.score > self.highscore:
             self.highscore = self.score
-            #pokazvane na topkata
-        self.ball.update()
-        # rotated = pygame.transform.rotate(self.ball.image, self.ball.angle)
-        # size = rotated.get_size()
-        # self.subrect.centerx = size[0] / 2
-        # self.subrect.centery = size[1] / 2
-        # self.newimg = rotated.subsurface(self.subrect)
 
         if self.tries == 0:
             self.game_over = True
-            self.SendToAll({'action': 'game_over', 'data' : self.get_json(), 'highscore': self.highscore})
-            pygame.quit()
-            exit()
 
     def get_json(self):
         return json.dumps({'images': {str(id(self)): {'image': 'ball', 'x': self.ball.x, 'y': self.ball.y}}})
 
-    def Launch(self):
+    def generate_coordinates(self):
+        coords = self.ball.get_coordinates()#
+        coords.insert(0, ("ball_background", 0, 0))
+        return coords
+
+    def additional_params(self):
+        return {}
+
+    def handle_input(self, input):
+        pass
+
+    def iter(self, keyboard_input=None, mouse_input=None):
+        #self.clock.tick(100)
+        print(mouse_input)
+        if mouse_input is not None:
+            self.pointer.rect.x, self.pointer.rect.y = mouse_input[0], mouse_input[1]
+        self.update()
+        if not self.game_over:
+            return None
+        else:
+            return self.highscore >= self.difficulty
+
+
+
+
+class Gui:
+
+    def __init__(self, difficulty):
+        pygame.init()
+        # pygame.display.set_caption('Kick Ball')
+        # pygame.display.set_icon(pygame.image.load('../images/icon.png'))
+        # self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+        self.game = Game(difficulty)
+        # self.screen.fill((0, 0, 0))
+        # self.screen.set_colorkey((0, 0, 0))
+        self.screen_center = (WINDOWWIDTH / 2, WINDOWHEIGHT / 2)
+        # self.clock = pygame.time.Clock()
+        # self.font1 = pygame.font.Font('./data/font.ttf', 40)
+        # self.font2 = pygame.font.Font('./data/font.ttf', 22)
+        # self.font3 = pygame.font.Font('./data/font.ttf', 52)
+        # self.font4 = pygame.font.Font('./data/font.ttf', 16)
+        # self.draw_info()
+        self.game.ball.update()
+        # self.screen.blit(self.game.newimg, self.game.ball.rect)
+        # pygame.display.flip()
+
+    def start_game(self):
         while True:
-            self.Pump()
-            sleep(0.0001)
+            self.handle_game_event()
+            self.game.update()
+            # self.screen.fill((0, 0, 0))
+            # self.screen.blit(self.game.newimg, self.game.ball.rect)
+            # self.draw_info()
+            # pygame.display.flip()
+            if self.game.game_over:
+                return self.game.highscore
+
+    def handle_game_event(self):
+        pass
+        # for event in pygame.event.get():
+        #         if event.type == QUIT:
+        #             pygame.quit()
+        #             sys.exit()
+        #self.game.pointer.rect.x, self.game.pointer.rect.y = pygame.mouse.get_pos()
+
+    def draw_message(self, message):
+        font = pygame.font.Font('./data/font.ttf', 52)
+        label = font.render(message, 1, WHITE)
+        rect = label.get_rect()
+        rect.center = CENTER
+        self.screen.blit(label, rect)
+
+    def draw_info(self):
+        score_text = self.font1.render(str(self.game.score), 1, (255, 155, 155))
+        score_rect = score_text.get_rect()
+        score_rect.x = 20
+        highscore_text = self.font2.render(str(self.game.highscore), 1, (255, 255, 255))
+        highscore_rect = highscore_text.get_rect()
+        highscore_rect.y = score_rect.bottom + 5
+        highscore_rect.x = 5
+        if self.game.game_over:
+            self.draw_message('Game over :(')
+        title = self.font3.render('Keep the ball in the air!', 1, (255, 255, 255))
+        title_rect = title.get_rect()
+        title_rect.centerx = WINDOWWIDTH / 2
+        title_rect.y = score_rect.centery
+        self.screen.blit(score_text, score_rect)
+        self.screen.blit(highscore_text, highscore_rect)
+        self.screen.blit(title, title_rect)
 
 if __name__ == "__main__":
-    # get command line argument of server, port
-    if len(sys.argv) != 2:
-        print("Usage: {0} host:port".format(sys.argv[0]))
-        print("e.g. {0} localhost:31425".format(sys.argv[0]))
-    else:
-        host, port = sys.argv[1].split(":")
-        s = Game(localaddr=(host, int(port)))
-        s.Launch()
+    gui = Gui(10)
+    gui.start_game()
+    pygame.quit()
 
