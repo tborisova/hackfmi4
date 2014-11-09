@@ -13,7 +13,6 @@ from PodSixNet.Channel import Channel
 class ClientChannel(Channel):
 
     def __init__(self, *args, **kwargs):
-        self.nickname = "anonymous"
         Channel.__init__(self, *args, **kwargs)
 
     def Close(self):
@@ -29,7 +28,8 @@ class ClientChannel(Channel):
                                 'closest_type': data1['closest_type']})
 
     def Network_player_move(self, data):
-        self._server.player.move(data['move'])
+        if self._server.player_can_write(self):
+            self._server.player.move(data['move'])
 
 
 class Game_of_luck(Server):
@@ -42,8 +42,13 @@ class Game_of_luck(Server):
     def __init__(self, *args, **kwargs):
         Server.__init__(self, *args, **kwargs)
         self.players = WeakKeyDictionary()
+        self.players_order = WeakKeyDictionary()
+        self.current_index = 0
         self.clock = pygame.time.Clock()
         print('Server launched')
+
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
 
     def do_stuff(self):
         data = {}
@@ -82,10 +87,13 @@ class Game_of_luck(Server):
             sleep(0.0001)
 
     def Connected(self, channel, addr):
-        self.AddPlayer(channel)
+        if self.current_index < 2:
+            self.AddPlayer(channel)
 
     def AddPlayer(self, player):
         self.players[player] = True
+        self.players_order[player] = self.current_index
+        self.current_index += 1
 
     def DelPlayer(self, player):
         self.players[player] = False

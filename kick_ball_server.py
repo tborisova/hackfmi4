@@ -15,7 +15,6 @@ from settings import *
 class ClientChannel(Channel):
 
     def __init__(self, *args, **kwargs):
-        self.nickname = "anonymous"
         Channel.__init__(self, *args, **kwargs)
 
     def Close(self):
@@ -35,8 +34,9 @@ class ClientChannel(Channel):
                                 'highscore': self._server.highscore})
 
     def Network_mouse_pos(self, data):
-        self._server.pointer.rect.x = data['x']
-        self._server.pointer.rect.y = data['y']
+        if self._server.player_can_write(self):
+            self._server.pointer.rect.x = data['x']
+            self._server.pointer.rect.y = data['y']
 
 
 class Ball(pygame.sprite.Sprite):
@@ -105,7 +105,8 @@ class Game(Server):
     channelClass = ClientChannel
 
     def Connected(self, channel, addr):
-        self.AddPlayer(channel)
+        if self.current_index < 2:
+            self.AddPlayer(channel)
 
     def DelPlayer(self, player):
         self.players[player] = False
@@ -113,6 +114,8 @@ class Game(Server):
     def AddPlayer(self, player):
         self.players[player] = True
         self.SendPlayers()
+        self.players_order[player] = self.current_index
+        self.current_index += 1
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
@@ -121,7 +124,8 @@ class Game(Server):
         pygame.init()
         Server.__init__(self, *args, **kwargs)
         self.players = WeakKeyDictionary()
-        print('Server launched')
+        self.players_order = WeakKeyDictionary()
+        self.current_index = 0
         self.ball = Ball(*CENTER)
         self.pointer = Pointer()
         self.score = 0
@@ -134,7 +138,8 @@ class Game(Server):
         self.newimg = self.ball.image
         self.tries = TRIES
         self.game_over = False
-
+        print('Server launched')
+        
     def check_for_collision(self):
         if pygame.sprite.collide_mask(
                 self.pointer,

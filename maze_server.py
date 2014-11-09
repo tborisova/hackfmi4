@@ -74,7 +74,8 @@ class ClientChannel(Channel):
                                 'time_is_up': self._server.time_is_up()})
 
     def Network_player_move(self, data):
-        self._server.player.move(data['move'])
+        if self._server.player_can_write(self)
+            self._server.player.move(data['move'])
 
 
 class MazeGame(Server):
@@ -91,7 +92,12 @@ class MazeGame(Server):
         self.difference = 0
         self.clock = pygame.time.Clock()
         self.players = WeakKeyDictionary()
+        self.players = WeakKeyDictionary()
+        self.current_index = 0
         print('Server launched')
+
+    def player_can_write(self, channel):
+        return self.players_order[channel] == 0
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
@@ -255,10 +261,13 @@ class MazeGame(Server):
         self.time = 60 + 400 // self.difficulty
 
     def Connected(self, channel, addr):
-        self.AddPlayer(channel)
+        if self.current_index < 2:
+            self.AddPlayer(channel)
 
     def AddPlayer(self, player):
         self.players[player] = True
+        self.players_order[player] = self.current_index
+        self.current_index += 1
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
