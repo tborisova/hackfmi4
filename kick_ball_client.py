@@ -106,7 +106,7 @@ class Gui(ConnectionListener):
         subrect.centerx = size[0] / 2
         subrect.centery = size[1] / 2
         rotated_img = rotated.subsurface(subrect)
-        self.screen.blit(rotated_img, rect) #self.game.ball.rect)
+        self.screen.blit(rotated_img, rect)
 
 if __name__ == "__main__": 
     if len(sys.argv) != 2:

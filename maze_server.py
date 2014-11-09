@@ -6,6 +6,10 @@ import sys
 import time
 from renderer import draw_everything
 from event_handler import unparse
+from time import sleep, localtime
+from weakref import WeakKeyDictionary
+from PodSixNet.Server import Server
+from PodSixNet.Channel import Channel
 
 class Cell:
     def __init__(self):
@@ -36,14 +40,6 @@ class Player:
             if self.x // self.cell_size + 1 < len(maze) and self.x < len(maze) * self.cell_size and not maze[self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
                 self.x += self.cell_size
 
-import random
-import sys
-from time import sleep, localtime
-from weakref import WeakKeyDictionary
-
-from PodSixNet.Server import Server
-from PodSixNet.Channel import Channel
-
 class ClientChannel(Channel):
     
     def __init__(self, *args, **kwargs):
@@ -51,8 +47,7 @@ class ClientChannel(Channel):
         Channel.__init__(self, *args, **kwargs)
   
     def Close(self):
-        print("CLOSING")
-        # self._server.DelPlayer(self)
+        self._server.DelPlayer(self)
     
     def Network_print_game_state(self, data):
         objects = self._server.generate_coordinates()
@@ -68,8 +63,6 @@ class MazeGame(Server):
  
     channelClass = ClientChannel
 
-    # def DelPlayer(self):
-    #     self.players[]
     def __init__(self, *args, **kwargs):
         pygame.init()
         Server.__init__(self, *args, **kwargs) 
@@ -153,7 +146,6 @@ class MazeGame(Server):
             if len(visited) > 0:
                 cell = visited[len(visited) - 1]
 
-
             no_continuation = self.no_continuation_test(cell[0], cell[1])
 
     def generate_coordinates(self):
@@ -200,7 +192,6 @@ class MazeGame(Server):
 
     def AddPlayer(self, player):
         self.players[player] = True
-        # self.SendToPlayers()
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
@@ -216,8 +207,10 @@ class MazeGame(Server):
             self.Pump()
             sleep(0.0001)
 
+    def DelPlayer(self, player):
+        self.players[player] = False
+
 if __name__ == "__main__":
-    # get command line argument of server, port
     if len(sys.argv) != 2:
         print("Usage: {0} host:port".format(sys.argv[0]))
         print("e.g. {0} localhost:31425".format(sys.argv[0]))

@@ -16,8 +16,7 @@ class ClientChannel(Channel):
         Channel.__init__(self, *args, **kwargs)
   
     def Close(self):
-        print("CLOSING")
-        # self._server.DelPlayer(self)
+        self._server.DelPlayer(self)
     
     def Network_print_game_state(self, data):
         data1 = self._server.do_stuff()        
@@ -81,7 +80,9 @@ class Game_of_luck(Server):
 
     def AddPlayer(self, player):
         self.players[player] = True
-        # self.SendToPlayers()
+
+    def DelPlayer(self, player):
+        self.players[player] = False
 
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
@@ -108,7 +109,6 @@ class Wheel_of_fortune:
         self.center = center
         self.good_balls_count = good_balls_count
         self.speed = random.randint(400,800)
-        #self.speed = random.randint(400, 700)
         self.balls = [Fortune_ball(Vector2(0, Wheel_of_fortune.RADIUS).rotate((i * 360) / \
                                               Wheel_of_fortune.BALLS_COUNT), \
                                               center) \
@@ -134,7 +134,6 @@ class Fortune_ball:
         return (self.type, self.vector.x + self.wheel_center[0], self.vector.y + self.wheel_center[1])
    
 if __name__ == "__main__":
-    # get command line argument of server, port
     if len(sys.argv) != 2:
         print("Usage: {0} host:port".format(sys.argv[0]))
         print("e.g. {0} localhost:31425".format(sys.argv[0]))

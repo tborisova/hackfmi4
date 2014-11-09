@@ -6,9 +6,6 @@ import pygame
 import time
 from renderer import draw_everything
 from event_handler import unparse
-
-from renderer import draw_everything
-
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
 
