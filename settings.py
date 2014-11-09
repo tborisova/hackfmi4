@@ -10,6 +10,7 @@ KICK = 1.5
 TRIES = 3
 APP_PATH = os.path.dirname(__file__)
 IMAGES_PATH = APP_PATH + '/images/'
+FONTS_PATH = APP_PATH + '/data/fonts/'
 CENTER = WINDOWWIDTH / 2, WINDOWHEIGHT / 2
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
