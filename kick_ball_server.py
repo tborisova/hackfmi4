@@ -116,7 +116,6 @@ class Game(Server):
 
     def AddPlayer(self, player):
         self.players[player] = True
-        self.SendPlayers()
         self.players_order[player] = self.current_index
         self.current_index += 1
 
@@ -197,7 +196,7 @@ class Game(Server):
         self.ball.update()
         print(self.tries)
 
-        if self.tries == 0:
+        if self.tries <= 0:
             self.game_over = True
             self.SendToAll({'action': 'game_over',
                             'data': self.get_json(),
