@@ -4,23 +4,19 @@ import random
 import sys
 
 
-
 # # del------------------------------------------------del
 # import pygame
 # #import renderer
-
 # pygame.init()
 # #screen = pygame.display.set_mode((800, 600))
 # # ---------------------------------------------------/
-
-
 
 
 class Game_of_luck:
 
     FPS = 60
     WHEEL_CENTER = (400, 300)
-    SLOWDOWN = 2
+    SLOWDOWN = 6
 
     def __init__(self, difficulty):
         self.wheel = Wheel_of_fortune(difficulty, Game_of_luck.WHEEL_CENTER)
@@ -48,6 +44,7 @@ class Game_of_luck:
                 self.wheel.speed = 30
                 self.slowdown = 0
                 self.should_stop = True
+            
 
         if self.should_stop is True:
             if self.closest.vector[0] > 0:
@@ -55,6 +52,9 @@ class Game_of_luck:
                     return False
                 else:
                     return True 
+
+    def additional_params(self):
+        return {}
 
 
     # def start_game(self):
@@ -91,7 +91,6 @@ class Game_of_luck:
         pass
 
 
-
     # to json
     # def __str__(self):
     #    # return json
@@ -100,8 +99,6 @@ class Game_of_luck:
     #     #arrow = " \"key_of_arrow_object\" : {\"image\" : \"images/arrow_of_fortune.png\", \"x\" : " + str(self.wheel.center[0])  + ", \"y\" + " + str(self.wheel.center[1] - Wheel_of_fortune.RADIUS - 20) + "  } "
     #     return "{ \"images\" : {"  + background + arrow + ("".join([str(ball) + ", " for ball in self.wheel.balls]))[:-2] + "} }"
     #     #return "Arrow_of_fortune\n20\n" + str(- Wheel_of_fortune.RADIUS) + "\n\n" + "".join([str(ball) + "\n" for ball in self.wheel.balls])
-
-
 
 
 class Wheel_of_fortune:
@@ -145,16 +142,12 @@ class Fortune_ball:
     #         'y': self.vector[1] + self.wheel_center[1]}})[1:][:-1]
 
 
-
-
-
 # #test ------------------------------   ///////////////////////
 # game = Game_of_luck(3)
-# print(game.generate_coordinates())
-# print()
-# game.iter(None)
-# print(game.generate_coordinates())
+# while True:
+#     a = game.iter(None)
+#     if a is not None:
+#         break
+#     print(game.generate_coordinates())
 # #print(game.wheel.balls[0])
-# #print()
-# #print(game)
 # #-----------------------

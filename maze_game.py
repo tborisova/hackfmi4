@@ -146,24 +146,24 @@ class MazeGame:
         coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
-    def image_to_json(self, coordinate):
-        return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
+    # def image_to_json(self, coordinate):
+    #     return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
 
-    def generate_JSON_string(self):
-        coordinates = self.generate_coordinates()
-        json_dict = {}
-        for index, coordinate in enumerate(coordinates):
-            if coordinate[0] == "clock":
-                #to be implemented
-                continue
-            json_dict[str(id(coordinate))] = {"image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
-        #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
-        #items = "{\"images\" : { " + items + "}"
-        # items = json.dumps({"images": jsons})
-        # items = items.replace('\\', '')
-        #return json.dumps({"images": {"545478940": {"image": "maze_player", 'x': 30, 'y': 30}}})
-        something = {"images": json_dict}
-        return json.dumps(something)
+    # def generate_JSON_string(self):
+    #     coordinates = self.generate_coordinates()
+    #     json_dict = {}
+    #     for index, coordinate in enumerate(coordinates):
+    #         if coordinate[0] == "clock":
+    #             #to be implemented
+    #             continue
+    #         json_dict[str(id(coordinate))] = {"image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
+    #     #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
+    #     #items = "{\"images\" : { " + items + "}"
+    #     # items = json.dumps({"images": jsons})
+    #     # items = items.replace('\\', '')
+    #     #return json.dumps({"images": {"545478940": {"image": "maze_player", 'x': 30, 'y': 30}}})
+    #     something = {"images": json_dict}
+    #     return json.dumps(something)
 
         # json_string = ''
         # images = []
@@ -199,10 +199,11 @@ class MazeGame:
 
     def start_game(self):
         pygame.init()
-        #screen = pygame.display.set_mode((800, 600))
+        #
+        screen = pygame.display.set_mode((800, 600))
+        
         start = time.time()
         self.difference = 0
-        #print(self.generate_JSON_string())
         while True:
             self.clock.tick(60)
             #keys = pygame.key.get_pressed()
@@ -213,31 +214,28 @@ class MazeGame:
             self.difference = end - start
             if self.difference >= self.time:
                 return False
-            # if keys[pygame.K_LEFT]:
-            #     self.player.move("left")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_RIGHT]:
-            #     self.player.move("right")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_DOWN]:
-            #     self.player.move("down")
-            #     time.sleep(0.1)
-            # if keys[pygame.K_UP]:
-            #     self.player.move("up")
-            #     time.sleep(0.1)
-            self.event_handling()
-            #draw_everything(screen, self.generate_coordinates())
+
+            #
+            if keys[pygame.K_LEFT]:
+                self.player.move("left")
+                time.sleep(0.1)
+            if keys[pygame.K_RIGHT]:
+                self.player.move("right")
+                time.sleep(0.1)
+            if keys[pygame.K_DOWN]:
+                self.player.move("down")
+                time.sleep(0.1)
+            if keys[pygame.K_UP]:
+                self.player.move("up")
+                time.sleep(0.1)
+
+            draw_everything(screen, self.generate_coordinates())
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
 
-            x = self.generate_JSON_string()
-            #print(x)
-            with open("test_frame.json", "w") as json_file:
-                json_file.write(x)
-
-           # pygame.display.update()
+            pygame.display.update()
         return True
 
     def set_difficulty(self):
@@ -247,25 +245,25 @@ class MazeGame:
             self.maze = [[Cell() for i in range(int(self.difficulty * 2.3))] for j in range(int(self.difficulty * 2.3))]
         self.time = 60 + 400 // self.difficulty
 
-    def print(self):
-        #for testing purposes
-        for i in range(len(self.maze)):
-            for j in range(2):
-                for m in range(len(self.maze)):
-                    if j == 0:
-                        if self.maze[i][m].top_wall:
-                            print("+---", end="")
-                        else:
-                            print("+   ", end="")
-                        if m == len(self.maze) - 1:
-                            print("+")
-                    else:
-                        if self.maze[i][m].left_wall:
-                            print("|   ", end="")
-                        else:
-                            print("    ", end="")
-                        if m == len(self.maze) - 1:
-                            print("|")
-        for i in range(len(self.maze)):
-            print("+---", end="")
-        print("+")
+    # def print(self):
+    #     #for testing purposes
+    #     for i in range(len(self.maze)):
+    #         for j in range(2):
+    #             for m in range(len(self.maze)):
+    #                 if j == 0:
+    #                     if self.maze[i][m].top_wall:
+    #                         print("+---", end="")
+    #                     else:
+    #                         print("+   ", end="")
+    #                     if m == len(self.maze) - 1:
+    #                         print("+")
+    #                 else:
+    #                     if self.maze[i][m].left_wall:
+    #                         print("|   ", end="")
+    #                     else:
+    #                         print("    ", end="")
+    #                     if m == len(self.maze) - 1:
+    #                         print("|")
+    #     for i in range(len(self.maze)):
+    #         print("+---", end="")
+    #     print("+")
