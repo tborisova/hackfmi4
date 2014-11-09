@@ -13,13 +13,24 @@ CURSORS = {"arrow": lambda: pygame.mouse.set_cursor(*pygame.cursors.arrow),
 class InputBox(Rect):
 
     PADDING = 3
-    HANDLED_KEYS = set([pygame.K_DELETE, pygame.K_BACKSPACE,
-                        pygame.K_LEFT, pygame.K_RIGHT]).union(range(
-        pygame.K_a, pygame.K_z + 1)).union(range(pygame.K_0, pygame.K_9 + 1))
+    HANDLED_KEYS = set(
+        [
+            pygame.K_DELETE,
+            pygame.K_BACKSPACE,
+            pygame.K_LEFT,
+            pygame.K_RIGHT]).union(
+        range(
+            pygame.K_a,
+            pygame.K_z +
+            1)).union(
+        range(
+            pygame.K_0,
+            pygame.K_9 +
+            1))
 
     def __init__(self, dimensions, pos, text="", text_colour=(0, 0, 0),
                  text_font=(None, 50), bg_colour=(255, 255, 255),
-                 frame_colour=None, frame_size=0):
+                 frame_colour=(0, 0, 0), frame_size=1):
         Rect.__init__(self, (pos[0] - dimensions[0] / 2,
                              pos[1] - dimensions[1] / 2), dimensions)
         self.text = text

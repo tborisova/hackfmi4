@@ -7,13 +7,17 @@ import time
 from renderer import draw_everything
 from event_handler import unparse
 
+
 class Cell:
+
     def __init__(self):
         self.top_wall = True
         self.left_wall = True
         self.was_visited = False
 
+
 class Player:
+
     def __init__(self, maze):
         self.x = 7
         self.y = 7
@@ -24,20 +28,31 @@ class Player:
     def move(self, direction):
         maze = list(zip(*self.maze))
         if direction == "up":
-            if self.y > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].top_wall:
+            if self.y > 0 and not maze[
+                    self.x //
+                    self.cell_size][
+                    self.y //
+                    self.cell_size].top_wall:
                 self.y -= self.cell_size
         if direction == "down":
-            if self.y // self.cell_size + 1 < len(maze) and self.y < len(maze) * self.cell_size and not maze[self.x // self.cell_size][self.y // self.cell_size + 1].top_wall:
+            if self.y // self.cell_size + 1 < len(maze) and self.y < len(maze) * self.cell_size and not maze[
+                    self.x // self.cell_size][self.y // self.cell_size + 1].top_wall:
                 self.y += self.cell_size
         if direction == "left":
-            if self.x > 0 and not maze[self.x // self.cell_size][self.y // self.cell_size].left_wall:
+            if self.x > 0 and not maze[
+                    self.x //
+                    self.cell_size][
+                    self.y //
+                    self.cell_size].left_wall:
                 self.x -= self.cell_size
         if direction == "right":
-            if self.x // self.cell_size + 1 < len(maze) and self.x < len(maze) * self.cell_size and not maze[self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
+            if self.x // self.cell_size + 1 < len(maze) and self.x < len(maze) * self.cell_size and not maze[
+                    self.x // self.cell_size + 1][self.y // self.cell_size].left_wall:
                 self.x += self.cell_size
 
 
 class MazeGame:
+
     def __init__(self, difficulty):
         self.difficulty = difficulty
         #self.maze = [[Cell() for i in range(3)] for j in range(3)]
@@ -46,15 +61,19 @@ class MazeGame:
         self.player = Player(self.maze)
         self.width = 800
         self.height = 600
-        self.displacement_x = self.width // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
-        self.displacement_y = self.height // 2 - len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.displacement_x = self.width // 2 - \
+            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
+        self.displacement_y = self.height // 2 - \
+            len(self.maze) * self.player.cell_size + (len(self.maze) // 2) * self.player.cell_size
         self.clock = pygame.time.Clock()
 
     def no_continuation_test(self, cell_x, cell_y):
         should_pop = True
-        if cell_y + 1 < len(self.maze) and not self.maze[cell_x][cell_y + 1].was_visited:
+        if cell_y + \
+                1 < len(self.maze) and not self.maze[cell_x][cell_y + 1].was_visited:
             should_pop = False
-        if cell_x + 1 < len(self.maze) and not self.maze[cell_x + 1][cell_y].was_visited:
+        if cell_x + \
+                1 < len(self.maze) and not self.maze[cell_x + 1][cell_y].was_visited:
             should_pop = False
         if cell_y - 1 >= 0 and not self.maze[cell_x][cell_y - 1].was_visited:
             should_pop = False
@@ -64,9 +83,11 @@ class MazeGame:
 
     def list_all_available_neighbours(self, cell_x, cell_y):
         neighbours = []
-        if cell_y + 1 < len(self.maze) and not self.maze[cell_x][cell_y + 1].was_visited:
+        if cell_y + \
+                1 < len(self.maze) and not self.maze[cell_x][cell_y + 1].was_visited:
             neighbours.append(1)
-        if cell_x + 1 < len(self.maze) and not self.maze[cell_x + 1][cell_y].was_visited:
+        if cell_x + \
+                1 < len(self.maze) and not self.maze[cell_x + 1][cell_y].was_visited:
             neighbours.append(2)
         if cell_y - 1 >= 0 and not self.maze[cell_x][cell_y - 1].was_visited:
             neighbours.append(3)
@@ -82,7 +103,7 @@ class MazeGame:
             position = random.randint(0, len(neighbours) - 1)
         if len(neighbours) != 0:
             cell = neighbours[position]
-            #this might be a problem
+            # this might be a problem
             if cell == 1:
                 self.maze[cell_x][cell_y + 1].left_wall = False
                 self.maze[cell_x][cell_y + 1].was_visited = True
@@ -120,7 +141,6 @@ class MazeGame:
             if len(visited) > 0:
                 cell = visited[len(visited) - 1]
 
-
             no_continuation = self.no_continuation_test(cell[0], cell[1])
 
     def generate_coordinates(self):
@@ -129,39 +149,88 @@ class MazeGame:
         for i in range(len(self.maze)):
             for j in range(len(self.maze)):
                 if maze[i][j].left_wall and maze[i][j].top_wall:
-                    coordinates.append(("top_left_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
+                    coordinates.append(
+                        ("top_left_wall",
+                         self.displacement_x +
+                         i *
+                         self.player.cell_size,
+                         self.displacement_y +
+                         j *
+                         self.player.cell_size))
                 elif maze[i][j].top_wall:
-                    coordinates.append(("top_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
+                    coordinates.append(
+                        ("top_wall",
+                         self.displacement_x +
+                         i *
+                         self.player.cell_size,
+                         self.displacement_y +
+                         j *
+                         self.player.cell_size))
                 elif maze[i][j].left_wall:
-                    coordinates.append(("left_wall", self.displacement_x + i * self.player.cell_size, self.displacement_y + j * self.player.cell_size))
+                    coordinates.append(
+                        ("left_wall",
+                         self.displacement_x +
+                         i *
+                         self.player.cell_size,
+                         self.displacement_y +
+                         j *
+                         self.player.cell_size))
 
         for i in range(len(maze)):
-            coordinates.append(("left_wall", self.displacement_x + len(maze) * self.player.cell_size,
-                                self.displacement_y + i * self.player.cell_size))
-            coordinates.append(("top_wall", self.displacement_x + i * self.player.cell_size,
-                                self.displacement_y + len(maze) * self.player.cell_size))
-        coordinates.append(("maze_player", self.displacement_x + self.player.x, self.displacement_y + self.player.y))
-        coordinates.append(("maze_win", self.displacement_x + (len(maze) - 1) * self.player.cell_size + self.player.displacement,
-                            self.displacement_y + (len(maze) - 1) * self.player.cell_size + self.player.displacement))
-        coordinates.append(("clock", str(self.time - int(self.difference)), 0, 0))
+            coordinates.append(
+                ("left_wall",
+                 self.displacement_x +
+                 len(maze) *
+                    self.player.cell_size,
+                    self.displacement_y +
+                    i *
+                    self.player.cell_size))
+            coordinates.append(
+                ("top_wall",
+                 self.displacement_x +
+                 i *
+                 self.player.cell_size,
+                 self.displacement_y +
+                 len(maze) *
+                    self.player.cell_size))
+        coordinates.append(
+            ("maze_player",
+             self.displacement_x +
+             self.player.x,
+             self.displacement_y +
+             self.player.y))
+        coordinates.append(("maze_win", self.displacement_x +
+                            (len(maze) -
+                             1) *
+                            self.player.cell_size +
+                            self.player.displacement, self.displacement_y +
+                            (len(maze) -
+                             1) *
+                            self.player.cell_size +
+                            self.player.displacement))
+        coordinates.append(
+            ("clock", str(self.time - int(self.difference)), 0, 0))
         return coordinates
 
     def image_to_json(self, coordinate):
-        return json.dumps({(str(id(coordinate))): {'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
+        return json.dumps({(str(id(coordinate))): {
+                          'image': coordinate[0], 'x': coordinate[1], 'y': coordinate[2]}})
 
     def generate_JSON_string(self):
         coordinates = self.generate_coordinates()
         json_dict = {}
         for index, coordinate in enumerate(coordinates):
             if coordinate[0] == "clock":
-                #to be implemented
+                # to be implemented
                 continue
-            json_dict[str(id(coordinate))] = {"image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
+            json_dict[str(id(coordinate))] = {
+                "image": coordinate[0], "x": coordinate[1], 'y': coordinate[2]}
         #items = json.dumps([self.image_to_json(item) for item in coordinates])[1:][:-1]
         #items = "{\"images\" : { " + items + "}"
         # items = json.dumps({"images": jsons})
         # items = items.replace('\\', '')
-        #return json.dumps({"images": {"545478940": {"image": "maze_player", 'x': 30, 'y': 30}}})
+        # return json.dumps({"images": {"545478940": {"image": "maze_player",
+        # 'x': 30, 'y': 30}}})
         something = {"images": json_dict}
         return json.dumps(something)
 
@@ -177,7 +246,7 @@ class MazeGame:
 
     def check_if_player_wins(self):
         if self.player.x == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement and \
-            self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
+                self.player.y == (len(self.maze) - 1) * self.player.cell_size + self.player.displacement:
             return True
 
     def event_handling(self):
@@ -185,28 +254,27 @@ class MazeGame:
         if events is not None:
             if events["left"]:
                 self.player.move("left")
-                #time.sleep(0.1)
+                # time.sleep(0.1)
             if events["right"]:
                 self.player.move("right")
-                #time.sleep(0.1)
+                # time.sleep(0.1)
             if events["up"]:
                 self.player.move("up")
-                #time.sleep(0.1)
+                # time.sleep(0.1)
             if events["down"]:
                 self.player.move("down")
-                #time.sleep(0.1)
-
+                # time.sleep(0.1)
 
     def start_game(self):
         pygame.init()
         #screen = pygame.display.set_mode((800, 600))
         start = time.time()
         self.difference = 0
-        #print(self.generate_JSON_string())
+        # print(self.generate_JSON_string())
         while True:
             self.clock.tick(60)
             #keys = pygame.key.get_pressed()
-            #this is to be moved in another module
+            # this is to be moved in another module
             if self.check_if_player_wins():
                 return True
             end = time.time()
@@ -233,7 +301,7 @@ class MazeGame:
                     sys.exit()
 
             x = self.generate_JSON_string()
-            #print(x)
+            # print(x)
             with open("test_frame.json", "w") as json_file:
                 json_file.write(x)
 
@@ -244,11 +312,12 @@ class MazeGame:
         if self.difficulty <= 6:
             self.maze = [[Cell() for i in range(10)] for j in range(10)]
         else:
-            self.maze = [[Cell() for i in range(int(self.difficulty * 2.3))] for j in range(int(self.difficulty * 2.3))]
+            self.maze = [[Cell() for i in range(int(self.difficulty * 2.3))]
+                         for j in range(int(self.difficulty * 2.3))]
         self.time = 60 + 400 // self.difficulty
 
     def print(self):
-        #for testing purposes
+        # for testing purposes
         for i in range(len(self.maze)):
             for j in range(2):
                 for m in range(len(self.maze)):
